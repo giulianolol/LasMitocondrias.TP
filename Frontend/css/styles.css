@@ -48,7 +48,7 @@ nav {
 .nav-links {
     list-style: none;
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     gap: 20px;
     z-index: 1;
 }
@@ -62,4 +62,9 @@ nav {
 
 .nav-links li a:hover {
     color: #1abc9c;
+}
+
+.nav-link.active-border {
+    border-bottom: 3px solid white;
+    padding-bottom: 2px;
 }
