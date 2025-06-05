@@ -20,6 +20,7 @@ function resaltarNavActivo() {
 // Si estamos en bienvenida.html, prepara el botón
 function manejarBienvenida() {
     const btn = document.getElementById("btnIngresar");
+    console.log("CLICK") //No escucha correctamente el click
     if (btn) {
         btn.addEventListener("click", guardarNombre);
     }
