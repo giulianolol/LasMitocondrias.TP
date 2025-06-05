@@ -3,6 +3,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config();
 const path = require('path');
+const administrator = require('./administrator');
 
 // 1) Inicializar Sequelize
 const sequelize = new Sequelize(process.env.SUPABASE_DB_URL, {
@@ -21,8 +22,9 @@ const sequelize = new Sequelize(process.env.SUPABASE_DB_URL, {
 })();
 
 // 3) Importar los modelos (las funciones de product.js y ventas.js)
-const Product = require('./product')(sequelize, DataTypes);
-const Venta   = require(path.join(__dirname, 'ventas'))(sequelize, DataTypes); //VERIFIAR FUNCIONAMIENTO DE VENTA, OJO CON RUTA DE DIRECTORIO
+const Product = require('./product')(sequelize, DataTypes)
+const Administrator = require(path.join(__dirname, 'administrator'))(sequelize, DataTypes)
+const Venta   = require(path.join(__dirname, 'ventas'))(sequelize, DataTypes) //VERIFIAR FUNCIONAMIENTO DE VENTA, OJO CON RUTA DE DIRECTORIO
 
 console.log('db.Product:', Product);
 
@@ -33,6 +35,7 @@ db.sequelize = sequelize;
 // 4) Guardar los modelos en db
 db.Product = Product;
 db.Venta   = Venta;
+db.Administrator = Administrator;
 
 // 5) Definir asociaciones (osea las foreign keys)
 Product.hasMany(Venta, { foreignKey: 'id_producto', sourceKey: 'id' });

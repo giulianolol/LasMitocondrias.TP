@@ -6,6 +6,10 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 // Importar la conexión y modelos
 const db = require('./models');
+const authAdmin = require('./middlewares/authAdmin');
+const productosRouter = require('./routes/api/productos');
+const ventasRouter = require('./routes/api/ventas');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -32,10 +36,27 @@ db.sequelize
 
     app.use('/api/test', require('./routes/api/test')); // RUTA PARA TESTEAR
     
-    app.use('/api/productos', require('./routes/api/productos'));
+    app.use('/api/administradores', require('./routes/api/administradores')) //RUTA DE ADMIN
 
-    app.use('/api/ventas', require('./routes/api/ventas'))
-    
+    app.use(
+      '/api/productos',
+      // middleware para diferenciar métodos
+      (req, res, next) => {
+        if (req.method === 'GET') return next();        // Listar/productos públicos
+        return authAdmin(req, res, next);               // POST/PUT/PATCH → admin
+      },
+      productosRouter
+    );
+
+    app.use(
+      '/api/ventas',
+      (req, res, next) => {
+        if (req.method === 'POST') return next();       // Registrar venta → público
+        return authAdmin(req, res, next);               // Listar ventas → admin
+      },
+      ventasRouter
+    );
+
     //Manejo de 404
     app.use((req, res, next) => {
         if (req.originalUrl.startsWith('/api/')) {
