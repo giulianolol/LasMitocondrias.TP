@@ -2,7 +2,7 @@
 
 # ----------------------------------------------------------
 # setup_backend.sh
-# Automatiza la instalación de Node.js, npm, Express y nodemon 
+# Automatiza la instalación de Node.js, npm y todas las dependencias del backend
 # ----------------------------------------------------------
 
 function echo_info {
@@ -19,11 +19,11 @@ if [ ! -d "$TARGET_DIR" ]; then
   exit 1
 fi
 
-echo_info "Actualizando paquetes e instalando dependencias..."
+echo_info "Actualizando paquetes e instalando dependencias de sistema..."
 sudo apt update -y
 sudo apt install -y curl build-essential
 
-#Instalar Node.js
+# Instalar Node.js
 if ! command -v node >/dev/null 2>&1; then
   echo_info "Instalando Node.js 18.x desde NodeSource..."
   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -40,8 +40,10 @@ else
   echo_info "npm existe: $(npm -v)"
 fi
 
+# Entrar a la carpeta Backend
 cd "$TARGET_DIR" || { echo_error "No se pudo entrar a $TARGET_DIR"; exit 1; }
 
+# Inicializar package.json si no existe
 if [ ! -f "package.json" ]; then
   echo_info "Inicializando package.json con valores por defecto..."
   npm init -y
@@ -49,9 +51,12 @@ else
   echo_info "package.json ya existe, se omite npm init."
 fi
 
-# Instalar Express y dependencias de desarrollo
-echo_info "Instalando express y nodemon..."
-npm install express
+# Instalar dependencias de producción
+echo_info "Instalando dependencias: express, dotenv, sequelize, ejs, express-session, connect-session-sequelize, pdfkit..."
+npm install express dotenv sequelize ejs express-session connect-session-sequelize pdfkit
+
+# Instalar dependencias de desarrollo
+echo_info "Instalando dependencias de desarrollo: nodemon..."
 npm install --save-dev nodemon
 
 # Ajustar scripts en package.json
@@ -65,5 +70,4 @@ else
   echo_info "Los scripts 'start' y/o 'dev' ya existían. Se omite esta parte."
 fi
 
-# 10. Mensaje final
 echo_info "Instalación completa."
