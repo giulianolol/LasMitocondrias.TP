@@ -46,9 +46,10 @@ function verificarNombreEnPaginasProtegidas() {
         if (!nombre) {
             window.location.href = "home.html";
         } else {
-            const saludo = document.createElement("p");
-            saludo.textContent = `Hola ${nombre}, ¡bienvenido!`;
-            document.body.prepend(saludo);
+            const contenedorSaludo = document.getElementById("saludoNavbar");
+            if (contenedorSaludo) {
+                contenedorSaludo.textContent = `Hola ${nombre}, ¡bienvenido!`;
+            }
         }
     }
 }

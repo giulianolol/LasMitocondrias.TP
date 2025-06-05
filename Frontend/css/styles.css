@@ -68,3 +68,10 @@ nav {
     border-bottom: 3px solid white;
     padding-bottom: 2px;
 }
+
+#saludoNavbar {
+    color: white;
+    font-size: 15px;
+    margin: 200px;
+    background-color: rgba(170, 170, 177, 0.185);
+}
