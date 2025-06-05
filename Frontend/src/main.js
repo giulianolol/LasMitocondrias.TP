@@ -20,7 +20,6 @@ function resaltarNavActivo() {
 // Si estamos en bienvenida.html, prepara el botón
 function manejarBienvenida() {
     const btn = document.getElementById("btnIngresar");
-    console.log("CLICK") //No escucha correctamente el click
     if (btn) {
         btn.addEventListener("click", guardarNombre);
     }
@@ -34,7 +33,9 @@ function guardarNombre() {
         return;
     }
     localStorage.setItem("nombreCliente", nombre);
-    window.location.href = "productos.html";
+    console.log("Nombre ingresado:", nombre);
+    window.location.href = "pages/productos.html";
+
 }
 
 // En productos, carrito, ticket: verificar si hay nombre cargado
@@ -45,7 +46,7 @@ function verificarNombreEnPaginasProtegidas() {
     if (paginasProtegidas.includes(pagina)) {
         const nombre = localStorage.getItem("nombreCliente");
         if (!nombre) {
-            window.location.href = "home.html";
+            window.location.href = "pages/index.html";
         } else {
             const contenedorSaludo = document.getElementById("saludoNavbar");
             if (contenedorSaludo) {
