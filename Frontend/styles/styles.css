@@ -28,7 +28,6 @@ header {
     color: white;
     font-size: 15px;
     background-color: rgba(67, 67, 94, 0.185);
-    margin-left: 1rem;
 }
 
 .navbar-center {
@@ -37,10 +36,8 @@ header {
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
-    /* ocupa el espacio disponible */
     text-align: center;
     white-space: nowrap;
-    /* evitar que el texto se rompa en varias líneas */
 }
 
 .autores {
@@ -54,7 +51,7 @@ header {
 }
 
 .navbar-nav li a:hover {
-    color: #1abc9c;
+    color: #1abc9c !important;
 }
 
 .nav-link.active-border {
