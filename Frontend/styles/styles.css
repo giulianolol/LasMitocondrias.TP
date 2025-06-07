@@ -6,72 +6,58 @@
 
 header {
     background-color: #383b3d;
-    padding: 10px;
     color: white;
+    padding: 10px;
 }
 
-nav {
+.navbar .container-fluid {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 100px;
+    position: relative;
 }
 
-.logo {
+#logo-text {
+    gap: 30px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
 }
 
-.logo img {
-    width: 80px;
-    height: 80px;
+#saludoNavbar {
+    color: white;
+    font-size: 15px;
+    background-color: rgba(67, 67, 94, 0.185);
+    margin-left: 1rem;
 }
 
-.logo-text {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
+.navbar-center {
     display: flex;
+    text-align: center;
     flex-direction: column;
-}
-
-.logo-text h1 {
-    font-size: 40px;
+    align-items: center;
+    flex-grow: 1;
+    /* ocupa el espacio disponible */
+    text-align: center;
+    white-space: nowrap;
+    /* evitar que el texto se rompa en varias líneas */
 }
 
 .autores {
     font-size: 14px;
     color: #ecf0f1;
+    margin-top: 5px;
 }
 
-.nav-links {
-    list-style: none;
-    display: flex;
-    justify-content: center;
+.navbar-nav {
     gap: 20px;
-    z-index: 1;
 }
 
-.nav-links li a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s;
-}
-
-.nav-links li a:hover {
+.navbar-nav li a:hover {
     color: #1abc9c;
 }
 
 .nav-link.active-border {
     border-bottom: 3px solid white;
     padding-bottom: 2px;
-}
-
-#saludoNavbar {
-    color: white;
-    font-size: 15px;
-    margin: 200px;
-    background-color: rgba(67, 67, 94, 0.185);
 }
