@@ -7,7 +7,9 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 // Importar la conexión y modelos
 const db = require('./models');
 const authAdmin = require('./middlewares/authAdmin');
+const adminController = require('./controllers/administradorController')
 const productosRouter = require('./routes/api/productos');
+const productosController = require('./controllers/productosController');
 const ventasRouter = require('./routes/api/ventas');
 
 const app = express();
@@ -36,17 +38,27 @@ db.sequelize
 
     app.use('/api/test', require('./routes/api/test')); // RUTA PARA TESTEAR
     
+    app.get('/admin/login', (req, res) => {  res.render('admin/login', { error: null }); });
+
+    app.post('/admin/login', adminController.loginAdministrator, (req, res) => { res.redirect('/admin/dashboard'); });
+
+    app.post('/admin/logout', adminController.logoutAdministrator, (req, res) => { res.redirect('/admin/login'); });
+
+    app.get('/admin/dashboard', authAdmin, async (req, res) => { const productos = await db.Product.findAll({ order: [['id', 'ASC']] }); res.render('admin/dashboard', { productos }); });
+
+    app.get('/admin/productos/new', authAdmin, (req, res) => {  res.render('admin/product-form', { producto: null });    });
+
+    app.post('/admin/productos', authAdmin, productosController.createProducto, (req, res) => {res.redirect('/admin/dashboard'); });
+
+    app.get('/admin/productos/:id/edit', authAdmin, async (req, res) => { const producto = await db.Product.findByPk(req.params.id); if (!producto) return res.redirect('/admin/dashboard'); res.render('admin/product-form', { producto }); });
+
+    app.put('/admin/productos/:id', authAdmin, productosController.updateProducto, (req, res) => { res.redirect('/admin/dashboard'); });
+
+    app.post('/admin/productos/:id/toggle', authAdmin, productosController.toggleProducto, (req, res) => { res.redirect('/admin/dashboard'); });
+
     app.use('/api/administradores', require('./routes/api/administradores')) //RUTA DE ADMIN
 
-    app.use(
-      '/api/productos',
-      // middleware para diferenciar métodos
-      (req, res, next) => {
-        if (req.method === 'GET') return next();        // Listar/productos públicos
-        return authAdmin(req, res, next);               // POST/PUT/PATCH → admin
-      },
-      productosRouter
-    );
+    app.use( '/api/productos', (req, res, next) => { if (req.method === 'GET') return next(); return authAdmin(req, res, next); }, productosRouter );
 
     app.use(
       '/api/ventas',
@@ -58,28 +70,13 @@ db.sequelize
     );
 
     //Manejo de 404
-    app.use((req, res, next) => {
-        if (req.originalUrl.startsWith('/api/')) {
-            return res.status(404).json({ error: 'Recurso no encontrado' });
-        }
-        return res.status(404).send('Página no encontrada');
-    });
+    app.use((req, res, next) => { if (req.originalUrl.startsWith('/api/')) { return res.status(404).json({ error: 'Recurso no encontrado' }); } return res.status(404).send('Página no encontrada');});
     
     //Error handler
-    app.use((err, req, res, next) => {
-        console.error(err);
-        if (req.originalUrl.startsWith('/api/')) {
-            return res.status(500).json({ error: 'Error interno del servidor' });
-        }
-        return res.status(500).send('Error interno del servidor');
-    });
+    app.use((err, req, res, next) => { console.error(err); if (req.originalUrl.startsWith('/api/')) { return res.status(500).json({ error: 'Error interno del servidor' }); } return res.status(500).send('Error interno del servidor'); });
     
     // Arrancar servidor
-    app.listen(PORT, () => {
-        console.log(`Servidor corriendo en http://localhost:${PORT}`);
-    });
-
+    app.listen(PORT, () => { console.log(`Servidor corriendo en http://localhost:${PORT}`); });
 })
-.catch((err) => {
-    console.error('Error al sincronizar la DB:', err);
-  });
+
+.catch((err) => { console.error('Error al sincronizar la DB:', err); });

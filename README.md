@@ -11,7 +11,7 @@ SETUP: setup_backend = Ejecutar este script para instalar las dependencias.
 
     # Models: Definimos los modelos para usar el  ORM (Sequalize)
 
-    # Routes -> API: Endpoints separados por módulos
+    # Routes -> API: Endpoints separados por módulos juntos con su lógica.
 
     # Services: Servicios Auxiliares (Subida de imagenes)
 
@@ -21,6 +21,8 @@ SETUP: setup_backend = Ejecutar este script para instalar las dependencias.
 
     # Utils: Funciones generales. (generar PDF, manejo de logs, etc.)
 
+    # Server.js: Importamos las sessiones, middelwares, conexiones y modelos, sincronizamos la base de datos y motamos las rutas.
+
 -FRONTEND:
     # CSS: Hoja de estilos.
 
@@ -29,3 +31,6 @@ SETUP: setup_backend = Ejecutar este script para instalar las dependencias.
     # IMG: Logo.
 
     # SRC:  App.js y Main.js
+
+--------------
+

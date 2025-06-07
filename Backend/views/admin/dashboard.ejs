@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/styles/admin.css" />
+</head>
+<body>
+  <header>
+    <h1>Dashboard</h1>
+    <form action="/admin/logout" method="POST" class="logout-form">
+      <button type="submit">Logout</button>
+    </form>
+  </header>
+  <main>
+    <section class="actions">
+      <a href="/admin/productos/new">Nuevo Producto</a>
+    </section>
+    <section class="products-list">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% productos.forEach(producto => { %>
+            <tr>
+              <td><%= producto.id %></td>
+              <td><%= producto.name %></td>
+              <td><%= producto.type %></td>
+              <td><%= producto.price %></td>
+              <td><%= producto.active ? 'Sí' : 'No' %></td>
+              <td>
+                <a href="/admin/productos/<%= producto.id %>/edit">Editar</a>
+                <form action="/admin/productos/<%= producto.id %>/toggle" method="POST" style="display:inline">
+                  <button type="submit"><%= producto.active ? 'Desactivar' : 'Activar' %></button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
