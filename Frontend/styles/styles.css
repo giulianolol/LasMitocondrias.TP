@@ -25,9 +25,9 @@ header {
 }
 
 #saludoNavbar {
-    color: white;
+    color: rgb(255, 0, 0);
     font-size: 15px;
-    background-color: rgba(67, 67, 94, 0.185);
+    background-color: rgba(7, 7, 236, 0.185);
 }
 
 .navbar-center {
@@ -42,18 +42,19 @@ header {
 
 .autores {
     font-size: 14px;
-    color: #ecf0f1;
     margin-top: 5px;
 }
 
-.navbar-nav {
+.navbar-nav { 
     gap: 20px;
 }
 
 .navbar-nav li a:hover {
-    color: #1abc9c !important;
+    color: #1abc9c ;
 }
-
+.navbar-nav li a {
+    color: #ffffff ;
+}
 .nav-link.active-border {
     border-bottom: 3px solid white;
     padding-bottom: 2px;
