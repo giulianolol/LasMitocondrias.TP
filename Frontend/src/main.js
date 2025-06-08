@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     resaltarNavActivo();
     manejarBienvenida();
     verificarNombreEnPaginasProtegidas();
+    configurarBotonesCategorias();  // <-- agregamos esta función acá
 });
 
 // Resalta el ítem del navbar activo
@@ -53,5 +54,33 @@ function verificarNombreEnPaginasProtegidas() {
                 contenedorSaludo.textContent = `Hola ${nombre}, ¡bienvenido!`;
             }
         }
+    }
+}
+
+
+function configurarBotonesCategorias() {
+    const btnTeclados = document.getElementById("btn-teclados");
+    const btnMouses = document.getElementById("btn-mouses");
+
+    if (btnTeclados && btnMouses) {
+        console.log("Botones de categorías encontrados" + btnTeclados + " y " + btnMouses);
+        btnTeclados.addEventListener("click", () => mostrarSeccion("teclados"));
+        btnMouses.addEventListener("click", () => mostrarSeccion("mouses"));
+    }
+
+    // Mostrar la sección de teclados por defecto
+    mostrarSeccion("teclados");
+}
+
+function mostrarSeccion(seccion) {
+    const seccionTeclados = document.getElementById("seccion-teclados");
+    const seccionMouses = document.getElementById("seccion-mouses");
+
+    if (seccion === "teclados") {
+        seccionTeclados.style.display = "block";
+        seccionMouses.style.display = "none";
+    } else if (seccion === "mouses") {
+        seccionTeclados.style.display = "none";
+        seccionMouses.style.display = "block";
     }
 }
