@@ -5,7 +5,6 @@
 }
 
 header {
-    background-color: #383b3d;
     color: white;
     padding: 10px;
 }
@@ -27,7 +26,6 @@ header {
 #saludoNavbar {
     color: rgb(255, 0, 0);
     font-size: 15px;
-    background-color: rgba(7, 7, 236, 0.185);
 }
 
 .navbar-center {
@@ -45,17 +43,44 @@ header {
     margin-top: 5px;
 }
 
-.navbar-nav { 
+.navbar-nav {
     gap: 20px;
 }
 
 .navbar-nav li a:hover {
-    color: #1abc9c ;
+    color: #1abc9c;
 }
+
 .navbar-nav li a {
-    color: #ffffff ;
+    color: #ffffff;
 }
+
 .nav-link.active-border {
     border-bottom: 3px solid white;
     padding-bottom: 2px;
+}
+
+
+/* cards */
+
+.card.bg-dark {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card.bg-dark:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+
+.card-img-top {
+    object-fit: cover;
+    height: 200px;
+}
+
+.btn-outline-light {
+    border-radius: 0.5rem;
+}
+
+h2 {
+    color: #ffffff;
 }
