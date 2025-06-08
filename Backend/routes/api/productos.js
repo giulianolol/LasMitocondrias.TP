@@ -4,7 +4,7 @@ const {
   getProductosActivos,
   createProducto,
   updateProducto,
-  toggleActive
+  toggleProducto
 } = require('../../controllers/productosController');
 
 // 1) Listar productos activos
@@ -21,6 +21,6 @@ router.put('/:id', updateProducto);
 
 // 4) Activar / Desactivar (toggle)
 //    PATCH /api/productos/:id/toggle
-router.patch('/:id/toggle', toggleActive);
+router.patch('/:id/toggle', toggleProducto);
 
 module.exports = router;

@@ -69,7 +69,7 @@ if (active !== undefined) {producto.active = active;}
 //PATCH /api/productos/:id/toggle
 //Invierte el valor booleano de 'active'
 
-exports.toggleActive = async (req, res) => {
+exports.toggleProducto = async (req, res) => {
   try {
     const { id } = req.params;
     const producto = await Product.findByPk(id);

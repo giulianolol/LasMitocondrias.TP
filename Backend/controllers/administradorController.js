@@ -39,7 +39,7 @@ exports.registerAdministrator = async (req, res) => {
  * POST /api/administradores/login
  * Recibe { email, password }. Verifica y crea sesión.
  */
-exports.loginAdministrator = async (req, res) => {
+exports.loginAdministrator = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -60,7 +60,9 @@ exports.loginAdministrator = async (req, res) => {
 
     // Crear sesión: guardamos el id del administrador en la sesión
     req.session.adminId = admin.id;
-    return res.json({ message: 'Login exitoso', email: admin.email });
+    // return res.json({ message: 'Login exitoso', email: admin.email });
+    return next();
+
   } catch (err) {
     console.error('Error en loginAdministrator:', err);
     return res.status(500).json({ error: err.message || 'Error al hacer login' });
@@ -71,7 +73,7 @@ exports.loginAdministrator = async (req, res) => {
  * POST /api/administradores/logout
  * Destruye la sesión del administrador.
  */
-exports.logoutAdministrator = async (req, res) => {
+exports.logoutAdministrator = async (req, res, next) => {
   try {
     req.session.destroy((err) => {
       if (err) {
@@ -80,7 +82,8 @@ exports.logoutAdministrator = async (req, res) => {
       }
       // Opcional: limpiar cookie en el frontend
       res.clearCookie('connect.sid');
-      return res.json({ message: 'Logout exitoso' });
+      // return res.json({ message: 'Logout exitoso' });
+      return next()
     });
   } catch (err) {
     console.error('Error en logoutAdministrator:', err);

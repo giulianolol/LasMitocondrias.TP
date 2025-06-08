@@ -52,8 +52,8 @@ else
 fi
 
 # Instalar dependencias de producción
-echo_info "Instalando dependencias: express, bcrypt, dotenv, sequelize, ejs, express-session, connect-session-sequelize, pdfkit"
-npm install express dotenv sequelize ejs bcrypt express-session connect-session-sequelize pdfkit
+echo_info "Instalando dependencias: express, bcrypt, dotenv, sequelize, ejs, express-session, connect-session-sequelize, pdfkit, method-override"
+npm install express dotenv sequelize ejs bcrypt express-session connect-session-sequelize pdfkit method-override
 
 # Instalar dependencias de desarrollo
 echo_info "Instalando dependencias de desarrollo: nodemon..."
