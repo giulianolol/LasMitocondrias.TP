@@ -47,21 +47,23 @@ header {
     gap: 20px;
 }
 
-.navbar-nav li a:hover {
-    color: #1abc9c;
+.navbar .navbar-nav .nav-item .nav-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
 }
 
-.navbar-nav li a {
-    color: #ffffff;
+.navbar .navbar-nav .nav-item .nav-link:hover {
+    text-decoration: none;
+    color: #9c9c9c;
+    cursor: pointer;
 }
+
 
 .nav-link.active-border {
     border-bottom: 3px solid white;
     padding-bottom: 2px;
 }
-
-
-/* cards */
 
 .card.bg-dark {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
