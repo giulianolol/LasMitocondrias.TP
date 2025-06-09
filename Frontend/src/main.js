@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    inicializarTema();
     resaltarNavActivo();
     manejarBienvenida();
     manejarFecha();
@@ -94,3 +95,43 @@ function obtenerFecha() {
     const año = hoy.getFullYear();
     return `${dia}/${mes}/${año}`;
 }
+
+function inicializarTema() {
+    const temaGuardado = localStorage.getItem('tema') || 'light';
+    document.documentElement.setAttribute('data-bs-theme', temaGuardado);
+
+    const boton = document.getElementById('botonTema');
+    if (boton) {
+        boton.textContent = temaGuardado === 'dark' ? '🌞' : '🌙';
+    }
+}
+
+function cambiarTema() {
+    const actual = document.documentElement.getAttribute('data-bs-theme');
+    const nuevo = actual === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-bs-theme', nuevo);
+    localStorage.setItem('tema', nuevo);
+
+    const boton = document.getElementById('botonTema');
+    if (boton) {
+        boton.textContent = nuevo === 'dark' ? '🌞' : '🌙';
+    }
+
+    const main = document.querySelector('main');
+    const card = document.querySelector('.card');
+
+    if (nuevo === 'dark') {
+        main.classList.remove('bg-body-secondary');
+        main.classList.add('bg-secondary', 'text-white');
+
+        card.classList.remove('bg-light');
+        card.classList.add('bg-secondary', 'text-white');
+    } else {
+        main.classList.remove('bg-dark', 'text-white');
+        main.classList.add('bg-body-secondary');
+
+        card.classList.remove('bg-secondary', 'text-white');
+        card.classList.add('bg-light');
+    }
+}
+
