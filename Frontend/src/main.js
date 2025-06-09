@@ -2,10 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
     resaltarNavActivo();
     manejarBienvenida();
     verificarNombreEnPaginasProtegidas();
-    configurarBotonesCategorias();  // <-- agregamos esta función acá
+    configurarBotonesCategorias();
 });
 
-// Resalta el ítem del navbar activo
 function resaltarNavActivo() {
     const paginaActual = location.pathname.split("/").pop().toLowerCase();
     document.querySelectorAll(".nav-link").forEach(link => {
@@ -18,7 +17,6 @@ function resaltarNavActivo() {
     });
 }
 
-// Si estamos en bienvenida.html, prepara el botón
 function manejarBienvenida() {
     const btn = document.getElementById("btnIngresar");
     if (btn) {
@@ -26,7 +24,6 @@ function manejarBienvenida() {
     }
 }
 
-// Guarda el nombre y redirige
 function guardarNombre() {
     const nombre = document.getElementById("nombreUsuario").value.trim();
     if (nombre === "") {
@@ -39,7 +36,6 @@ function guardarNombre() {
 
 }
 
-// En productos, carrito, ticket: verificar si hay nombre cargado
 function verificarNombreEnPaginasProtegidas() {
     const pagina = location.pathname.split("/").pop();
     const paginasProtegidas = ["productos.html", "carrito.html", "ticket.html"];
@@ -49,14 +45,13 @@ function verificarNombreEnPaginasProtegidas() {
         if (!nombre) {
             window.location.href = "pages/index.html";
         } else {
-            const contenedorSaludo = document.getElementById("saludoNavbar");
+            const contenedorSaludo = document.getElementById("nameTicket");
             if (contenedorSaludo) {
-                contenedorSaludo.textContent = `Hola ${nombre}, ¡bienvenido!`;
+                contenedorSaludo.textContent = ` ${nombre}`;
             }
         }
     }
 }
-
 
 function configurarBotonesCategorias() {
     const btnTeclados = document.getElementById("btn-teclados");
@@ -68,7 +63,6 @@ function configurarBotonesCategorias() {
         btnMouses.addEventListener("click", () => mostrarSeccion("mouses"));
     }
 
-    // Mostrar la sección de teclados por defecto
     mostrarSeccion("teclados");
 }
 
@@ -84,3 +78,13 @@ function mostrarSeccion(seccion) {
         seccionMouses.style.display = "block";
     }
 }
+
+function obtenerFechaCompleta() {
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const año = hoy.getFullYear();
+    return `${dia}/${mes}/${año}`;
+}
+
+document.getElementById("fechaCompleta").textContent = obtenerFechaCompleta();
