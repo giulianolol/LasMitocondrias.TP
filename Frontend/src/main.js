@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     resaltarNavActivo();
     manejarBienvenida();
-    verificarNombreEnPaginasProtegidas();
+    manejarFecha();
+    verificarNombre();
     configurarBotonesCategorias();
 });
 
@@ -36,7 +37,7 @@ function guardarNombre() {
 
 }
 
-function verificarNombreEnPaginasProtegidas() {
+function verificarNombre() {
     const pagina = location.pathname.split("/").pop();
     const paginasProtegidas = ["productos.html", "carrito.html", "ticket.html"];
 
@@ -47,7 +48,7 @@ function verificarNombreEnPaginasProtegidas() {
         } else {
             const contenedorSaludo = document.getElementById("nameTicket");
             if (contenedorSaludo) {
-                contenedorSaludo.textContent = ` ${nombre}`;
+                contenedorSaludo.textContent = `${nombre}`;
             }
         }
     }
@@ -79,12 +80,17 @@ function mostrarSeccion(seccion) {
     }
 }
 
-function obtenerFechaCompleta() {
+function manejarFecha() {
+    const fecha = document.getElementById("fechaCompleta");
+    if (fecha) {
+        fecha.textContent = obtenerFecha();
+    }
+}
+
+function obtenerFecha() {
     const hoy = new Date();
     const dia = String(hoy.getDate()).padStart(2, '0');
     const mes = String(hoy.getMonth() + 1).padStart(2, '0');
     const año = hoy.getFullYear();
     return `${dia}/${mes}/${año}`;
 }
-
-document.getElementById("fechaCompleta").textContent = obtenerFechaCompleta();
