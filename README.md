@@ -24,13 +24,16 @@ SETUP: setup_backend = Ejecutar este script para instalar las dependencias.
     # Server.js: Importamos las sessiones, middelwares, conexiones y modelos, sincronizamos la base de datos y motamos las rutas.
 
 -FRONTEND:
-    # CSS: Hoja de estilos.
 
-    # HTML: Carpeta de documentos HTML.
+    # assets: img: imagenes.
 
-    # IMG: Logo.
+    # pages: Carpeta de documentos HTML.
 
-    # SRC:  App.js y Main.js
+    # src: main.js y app.js
 
+    # styles: styles.css
+    
+    # index.html
+    
 --------------
 
