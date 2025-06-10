@@ -13,6 +13,7 @@ function resaltarNavActivo() {
         const href = link.getAttribute("href").split("/").pop().toLowerCase();
         if (href === paginaActual || (paginaActual === "" && href === "home.html")) {
             link.classList.add("active-border");
+            console.log("Resaltando enlace activo:", href);
         } else {
             link.classList.remove("active-border");
         }
@@ -98,7 +99,6 @@ function obtenerFecha() {
 
 function inicializarTema() {
     const temaGuardado = localStorage.getItem('tema') || 'light';
-
     document.documentElement.setAttribute('data-bs-theme', temaGuardado);
 
     const boton = document.getElementById('botonTema');
@@ -107,20 +107,25 @@ function inicializarTema() {
     }
 
     const main = document.querySelector('main');
+    if (main) {
+        if (temaGuardado === 'dark') {
+            main.classList.remove('bg-body-secondary');
+            main.classList.add('bg-secondary', 'text-white');
+        } else {
+            main.classList.remove('bg-secondary', 'text-white');
+            main.classList.add('bg-body-secondary');
+        }
+    }
+
     const card = document.querySelector('.card');
-
-    if (temaGuardado === 'dark') {
-        main.classList.remove('bg-body-secondary');
-        main.classList.add('bg-secondary', 'text-white');
-
-        card.classList.remove('bg-light');
-        card.classList.add('bg-secondary', 'text-white');
-    } else {
-        main.classList.remove('bg-dark', 'text-white');
-        main.classList.add('bg-body-secondary');
-
-        card.classList.remove('bg-secondary', 'text-white');
-        card.classList.add('bg-light');
+    if (card) {
+        if (temaGuardado === 'dark') {
+            card.classList.remove('bg-light');
+            card.classList.add('bg-secondary', 'text-white');
+        } else {
+            card.classList.remove('bg-secondary', 'text-white');
+            card.classList.add('bg-light');
+        }
     }
 }
 
@@ -132,26 +137,31 @@ function cambiarTema() {
 
     const boton = document.getElementById('botonTema');
     if (boton) {
-
         boton.textContent = nuevo === 'dark' ? '🌞' : '🌙';
         console.log("Tema cambiado a:", nuevo);
     }
 
     const main = document.querySelector('main');
+    if (main) {
+        if (nuevo === 'dark') {
+            main.classList.remove('bg-body-secondary');
+            main.classList.add('bg-secondary', 'text-white');
+        } else {
+            main.classList.remove('bg-secondary', 'text-white');
+            main.classList.add('bg-body-secondary');
+        }
+    }
+
     const card = document.querySelector('.card');
-
-    if (nuevo === 'dark') {
-        main.classList.remove('bg-body-secondary');
-        main.classList.add('bg-secondary', 'text-white');
-
-        card.classList.remove('bg-light');
-        card.classList.add('bg-secondary', 'text-white');
-    } else {
-        main.classList.remove('bg-dark', 'text-white');
-        main.classList.add('bg-body-secondary');
-
-        card.classList.remove('bg-secondary', 'text-white');
-        card.classList.add('bg-light');
+    if (card) {
+        if (nuevo === 'dark') {
+            card.classList.remove('bg-light');
+            card.classList.add('bg-secondary', 'text-white');
+        } else {
+            card.classList.remove('bg-secondary', 'text-white');
+            card.classList.add('bg-light');
+        }
     }
 }
+
 
