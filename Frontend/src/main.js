@@ -98,11 +98,29 @@ function obtenerFecha() {
 
 function inicializarTema() {
     const temaGuardado = localStorage.getItem('tema') || 'light';
+
     document.documentElement.setAttribute('data-bs-theme', temaGuardado);
 
     const boton = document.getElementById('botonTema');
     if (boton) {
         boton.textContent = temaGuardado === 'dark' ? '🌞' : '🌙';
+    }
+
+    const main = document.querySelector('main');
+    const card = document.querySelector('.card');
+
+    if (temaGuardado === 'dark') {
+        main.classList.remove('bg-body-secondary');
+        main.classList.add('bg-secondary', 'text-white');
+
+        card.classList.remove('bg-light');
+        card.classList.add('bg-secondary', 'text-white');
+    } else {
+        main.classList.remove('bg-dark', 'text-white');
+        main.classList.add('bg-body-secondary');
+
+        card.classList.remove('bg-secondary', 'text-white');
+        card.classList.add('bg-light');
     }
 }
 
@@ -114,7 +132,9 @@ function cambiarTema() {
 
     const boton = document.getElementById('botonTema');
     if (boton) {
+
         boton.textContent = nuevo === 'dark' ? '🌞' : '🌙';
+        console.log("Tema cambiado a:", nuevo);
     }
 
     const main = document.querySelector('main');
