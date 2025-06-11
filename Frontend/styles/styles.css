@@ -86,3 +86,16 @@ header {
 h2 {
     color: #ffffff;
 }
+
+.bg-dark-blue {
+    background-color: #010816 !important;
+    color: white !important;
+}
+
+.borde-inferior {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.borde-superior {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}

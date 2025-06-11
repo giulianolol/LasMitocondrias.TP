@@ -55,54 +55,57 @@
         </nav>
     </header>
     <main class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Listado de Productos</h2>
-            <div>
-                <a href="altas.html" class="btn btn-success me-2">Alta de Producto</a>
+        <section class="dashboard">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Listado de Productos</h2>
+                <div>
+                    <a href="altas.html" class="btn btn-success me-2">Alta de Producto</a>
+                </div>
             </div>
-        </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Activo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Producto A</td>
-                        <td>Descripción breve del producto A</td>
-                        <td>$1000</td>
-                        <td>25</td>
-                        <td>True</td>
-                        <td>
-                            <a href="modificaciones.html" class="btn btn-sm btn-warning">Modificar</a>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(1)">Eliminar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Producto B</td>
-                        <td>Descripción del producto B</td>
-                        <td>$1500</td>
-                        <td>10</td>
-                        <td>True</td>
-                        <td>
-                            <a href="modificaciones.html" class="btn btn-sm btn-warning">Modificar</a>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(2)">Eliminar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Producto A</td>
+                            <td>Descripción breve del producto A</td>
+                            <td>$1000</td>
+                            <td>25</td>
+                            <td>True</td>
+                            <td>
+                                <a href="modificaciones.html" class="btn btn-sm btn-warning">Modificar</a>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarProducto(1)">Eliminar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Producto B</td>
+                            <td>Descripción del producto B</td>
+                            <td>$1500</td>
+                            <td>10</td>
+                            <td>True</td>
+                            <td>
+                                <a href="modificaciones.html" class="btn btn-sm btn-warning">Modificar</a>
+                                <button class="btn btn-sm btn-danger" onclick="eliminarProducto(2)">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
     </main>
 
     <footer class="bg-dark text-white text-center py-3 mt-auto">

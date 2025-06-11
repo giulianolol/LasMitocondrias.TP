@@ -107,24 +107,53 @@ function inicializarTema() {
     }
 
     const main = document.querySelector('main');
-    if (main) {
-        if (temaGuardado === 'dark') {
-            main.classList.remove('bg-body-secondary');
-            main.classList.add('bg-secondary', 'text-white');
-        } else {
-            main.classList.remove('bg-secondary', 'text-white');
-            main.classList.add('bg-body-secondary');
-        }
-    }
-
+    const body = document.body;
     const card = document.querySelector('.card');
-    if (card) {
-        if (temaGuardado === 'dark') {
+    const navbar = document.querySelector('header');
+    const footer = document.querySelector('footer');
+
+    if (temaGuardado === 'dark') {
+        if (main) {
+            main.classList.remove('bg-body-secondary');
+            main.classList.add('bg-dark', 'text-white');
+        }
+        body.classList.remove('bg-body-secondary');
+        body.classList.add('bg-dark', 'text-white');
+
+        if (card) {
             card.classList.remove('bg-light');
             card.classList.add('bg-secondary', 'text-white');
-        } else {
+        }
+
+        if (navbar) {
+            navbar.classList.remove('bg-dark', 'bg-primary', 'text-white');
+            navbar.classList.add('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-inferior');
+        }
+        if (footer) {
+            footer.classList.remove('bg-dark', 'bg-primary', 'text-white');
+            footer.classList.add('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-superior');
+        }
+
+    } else {
+        if (main) {
+            main.classList.remove('bg-dark', 'text-white');
+            main.classList.add('bg-body-secondary');
+        }
+        body.classList.remove('bg-dark', 'text-white');
+        body.classList.add('bg-body-secondary');
+
+        if (card) {
             card.classList.remove('bg-secondary', 'text-white');
             card.classList.add('bg-light');
+        }
+
+        if (navbar) {
+            navbar.classList.remove('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-inferior');
+            navbar.classList.add('bg-dark', 'text-white');
+        }
+        if (footer) {
+            footer.classList.remove('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-superior');
+            footer.classList.add('bg-dark', 'text-white');
         }
     }
 }
@@ -142,26 +171,53 @@ function cambiarTema() {
     }
 
     const main = document.querySelector('main');
-    if (main) {
-        if (nuevo === 'dark') {
-            main.classList.remove('bg-body-secondary');
-            main.classList.add('bg-secondary', 'text-white');
-        } else {
-            main.classList.remove('bg-secondary', 'text-white');
-            main.classList.add('bg-body-secondary');
-        }
-    }
-
+    const body = document.body;
     const card = document.querySelector('.card');
-    if (card) {
-        if (nuevo === 'dark') {
+    const navbar = document.querySelector('header');
+    const footer = document.querySelector('footer');
+
+    if (nuevo === 'dark') {
+        if (main) {
+            main.classList.remove('bg-body-secondary');
+            main.classList.add('bg-dark', 'text-white');
+        }
+        body.classList.remove('bg-body-secondary');
+        body.classList.add('bg-dark', 'text-white');
+
+        if (card) {
             card.classList.remove('bg-light');
             card.classList.add('bg-secondary', 'text-white');
-        } else {
+        }
+
+        if (navbar) {
+            navbar.classList.remove('bg-dark', 'bg-primary', 'text-white');
+            navbar.classList.add('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-inferior');
+        }
+        if (footer) {
+            footer.classList.remove('bg-dark', 'bg-primary', 'text-white');
+            footer.classList.add('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-superior');
+        }
+
+    } else {
+        if (main) {
+            main.classList.remove('bg-dark', 'text-white');
+            main.classList.add('bg-body-secondary');
+        }
+        body.classList.remove('bg-dark', 'text-white');
+        body.classList.add('bg-body-secondary');
+
+        if (card) {
             card.classList.remove('bg-secondary', 'text-white');
             card.classList.add('bg-light');
         }
+
+        if (navbar) {
+            navbar.classList.remove('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-inferior');
+            navbar.classList.add('bg-dark', 'text-white');
+        }
+        if (footer) {
+            footer.classList.remove('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-superior');
+            footer.classList.add('bg-dark', 'text-white');
+        }
     }
 }
-
-
