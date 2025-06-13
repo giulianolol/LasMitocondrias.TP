@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     manejarFecha();
     verificarNombre();
     configurarBotonesCategorias();
+    validarNombre();
 });
 
 function resaltarNavActivo() {
@@ -29,12 +30,13 @@ function manejarBienvenida() {
 
 function guardarNombre() {
     const nombre = document.getElementById("nombreUsuario").value.trim();
-    if (nombre === "") {
-        alert("Por favor, ingresá tu nombre.");
+    const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,}$/;
+
+    if (nombre === "" || !regex.test(nombre)) {
+        alert("Por favor, ingresá un nombre válido (solo letras, mínimo 2 caracteres).");
         return;
     }
     localStorage.setItem("nombreCliente", nombre);
-    console.log("Nombre ingresado:", nombre);
     window.location.href = "pages/productos.html";
 
 }
@@ -127,11 +129,11 @@ function inicializarTema() {
 
         if (navbar) {
             navbar.classList.remove('bg-dark', 'bg-primary', 'text-white');
-            navbar.classList.add('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-inferior');
+            navbar.classList.add('bg-dark-blue', 'text-white');
         }
         if (footer) {
             footer.classList.remove('bg-dark', 'bg-primary', 'text-white');
-            footer.classList.add('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-superior');
+            footer.classList.add('bg-dark-blue', 'text-white');
         }
 
     } else {
