@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
     manejarFecha();
     verificarNombre();
     configurarBotonesCategorias();
-    validarNombre();
 });
 
 function resaltarNavActivo() {
@@ -14,7 +13,6 @@ function resaltarNavActivo() {
         const href = link.getAttribute("href").split("/").pop().toLowerCase();
         if (href === paginaActual || (paginaActual === "" && href === "home.html")) {
             link.classList.add("active-border");
-            console.log("Resaltando enlace activo:", href);
         } else {
             link.classList.remove("active-border");
         }
@@ -33,7 +31,7 @@ function guardarNombre() {
     const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,}$/;
 
     if (nombre === "" || !regex.test(nombre)) {
-        alert("Por favor, ingresá un nombre válido (solo letras, mínimo 2 caracteres).");
+        mostrarAlerta("Por favor, ingresá un nombre válido (solo letras, mínimo 2 caracteres).", "danger");
         return;
     }
     localStorage.setItem("nombreCliente", nombre);
@@ -63,7 +61,6 @@ function configurarBotonesCategorias() {
     const btnMouses = document.getElementById("btn-mouses");
 
     if (btnTeclados && btnMouses) {
-        console.log("Botones de categorías encontrados" + btnTeclados + " y " + btnMouses);
         btnTeclados.addEventListener("click", () => mostrarSeccion("teclados"));
         btnMouses.addEventListener("click", () => mostrarSeccion("mouses"));
     }
@@ -129,11 +126,11 @@ function inicializarTema() {
 
         if (navbar) {
             navbar.classList.remove('bg-dark', 'bg-primary', 'text-white');
-            navbar.classList.add('bg-dark-blue', 'text-white');
+            navbar.classList.add('bg-completly-black', 'text-white');
         }
         if (footer) {
             footer.classList.remove('bg-dark', 'bg-primary', 'text-white');
-            footer.classList.add('bg-dark-blue', 'text-white');
+            footer.classList.add('bg-completly-black', 'text-white');
         }
 
     } else {
@@ -150,11 +147,11 @@ function inicializarTema() {
         }
 
         if (navbar) {
-            navbar.classList.remove('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-inferior');
+            navbar.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
             navbar.classList.add('bg-dark', 'text-white');
         }
         if (footer) {
-            footer.classList.remove('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-superior');
+            footer.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-superior');
             footer.classList.add('bg-dark', 'text-white');
         }
     }
@@ -169,7 +166,6 @@ function cambiarTema() {
     const boton = document.getElementById('botonTema');
     if (boton) {
         boton.textContent = nuevo === 'dark' ? '🌞' : '🌙';
-        console.log("Tema cambiado a:", nuevo);
     }
 
     const main = document.querySelector('main');
@@ -193,11 +189,11 @@ function cambiarTema() {
 
         if (navbar) {
             navbar.classList.remove('bg-dark', 'bg-primary', 'text-white');
-            navbar.classList.add('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-inferior');
+            navbar.classList.add('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
         }
         if (footer) {
             footer.classList.remove('bg-dark', 'bg-primary', 'text-white');
-            footer.classList.add('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-superior');
+            footer.classList.add('bg-completly-black', 'text-white', 'sombra-suave', 'borde-superior');
         }
 
     } else {
@@ -214,12 +210,32 @@ function cambiarTema() {
         }
 
         if (navbar) {
-            navbar.classList.remove('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-inferior');
+            navbar.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
             navbar.classList.add('bg-dark', 'text-white');
         }
         if (footer) {
-            footer.classList.remove('bg-dark-blue', 'text-white', 'sombra-suave', 'borde-superior');
+            footer.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-superior');
             footer.classList.add('bg-dark', 'text-white');
         }
     }
+}
+
+function mostrarAlerta(mensaje, tipo = "success", duracion = 3000) {
+    const container = document.getElementById("alert-container");
+
+    const alerta = document.createElement("div");
+    alerta.className = `alert alert-${tipo} alert-dismissible fade show`;
+    alerta.role = "alert";
+    alerta.innerHTML = `
+    ${mensaje}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    container.appendChild(alerta);
+
+    setTimeout(() => {
+        alerta.classList.remove("show");
+        alerta.classList.add("hide");
+        alerta.addEventListener("transitionend", () => alerta.remove());
+    }, duracion);
 }
