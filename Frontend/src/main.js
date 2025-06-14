@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     manejarBienvenida();
     manejarFecha();
     verificarNombre();
+    mostrarTeclados();
     configurarBotonesCategorias();
 });
 
@@ -111,6 +112,7 @@ function inicializarTema() {
     const navbar = document.querySelector('header');
     const footer = document.querySelector('footer');
 
+
     if (temaGuardado === 'dark') {
         if (main) {
             main.classList.remove('bg-body-secondary');
@@ -163,9 +165,9 @@ function cambiarTema() {
     document.documentElement.setAttribute('data-bs-theme', nuevo);
     localStorage.setItem('tema', nuevo);
 
-    const boton = document.getElementById('botonTema');
-    if (boton) {
-        boton.textContent = nuevo === 'dark' ? '🌞' : '🌙';
+    const botonTema = document.getElementById('botonTema');
+    if (botonTema) {
+        botonTema.textContent = nuevo === 'dark' ? '🌞' : '🌙';
     }
 
     const main = document.querySelector('main');
@@ -179,6 +181,7 @@ function cambiarTema() {
             main.classList.remove('bg-body-secondary');
             main.classList.add('bg-dark', 'text-white');
         }
+
         body.classList.remove('bg-body-secondary');
         body.classList.add('bg-dark', 'text-white');
 
@@ -191,6 +194,7 @@ function cambiarTema() {
             navbar.classList.remove('bg-dark', 'bg-primary', 'text-white');
             navbar.classList.add('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
         }
+
         if (footer) {
             footer.classList.remove('bg-dark', 'bg-primary', 'text-white');
             footer.classList.add('bg-completly-black', 'text-white', 'sombra-suave', 'borde-superior');
@@ -201,6 +205,7 @@ function cambiarTema() {
             main.classList.remove('bg-dark', 'text-white');
             main.classList.add('bg-body-secondary');
         }
+
         body.classList.remove('bg-dark', 'text-white');
         body.classList.add('bg-body-secondary');
 
@@ -213,6 +218,7 @@ function cambiarTema() {
             navbar.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
             navbar.classList.add('bg-dark', 'text-white');
         }
+
         if (footer) {
             footer.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-superior');
             footer.classList.add('bg-dark', 'text-white');
@@ -239,3 +245,48 @@ function mostrarAlerta(mensaje, tipo = "success", duracion = 3000) {
         alerta.addEventListener("transitionend", () => alerta.remove());
     }, duracion);
 }
+
+async function mostrarTeclados() {
+    console.log('Cargando teclados...');
+
+    try {
+        const res = await fetch('http://localhost:3000/api/productos');
+        console.log('Petición a la API de productos realizada');
+
+        if (!res.ok) throw new Error('Error al obtener productos');
+
+        const productos = await res.json();
+        console.log('Productos obtenidos:', productos);
+
+        const teclados = productos.filter(p => p.categoria === 'teclado');
+        const contenedor = document.querySelector('#seccion-teclados .row');
+        if (!contenedor) return;
+
+        contenedor.innerHTML = ''; // Limpiar lo anterior
+
+        teclados.forEach(teclado => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4';
+
+            col.innerHTML = `
+                <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
+                    <img src="${teclado.imagen}" class="card-img-top" alt="${teclado.nombre}" />
+                    <div class="card-body">
+                        <h5 class="card-title">${teclado.nombre}</h5>
+                        <p class="card-text">Tipo: ${teclado.tipo}</p>
+                        <p class="card-text">Precio: $${teclado.precio}</p>
+                        <p class="card-text text-success">Estado: ${teclado.estado}</p>
+                        <p class="card-text">${teclado.descripcion}</p>
+                    </div>
+                </div>
+            `;
+
+            contenedor.appendChild(col);
+        });
+
+    } catch (err) {
+        console.error('Error al cargar teclados:', err);
+    }
+}
+
+
