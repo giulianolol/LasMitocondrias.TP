@@ -36,10 +36,15 @@ function guardarNombre() {
         mostrarAlerta("Por favor, ingresá un nombre válido (solo letras, mínimo 2 caracteres).", "danger");
         return;
     }
-    localStorage.setItem("nombreCliente", nombre);
-    window.location.href = "pages/productos.html";
 
+    mostrarAlerta(`¡Bienvenido, ${nombre}!`, "success");
+    localStorage.setItem("nombreCliente", nombre);
+
+    setTimeout(() => {
+        window.location.href = "pages/productos.html";
+    }, 2000);
 }
+
 
 function verificarNombre() {
     const pagina = location.pathname.split("/").pop();
