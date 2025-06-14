@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     manejarFecha();
     verificarNombre();
     mostrarTeclados();
+    mostrarMouses();
     configurarBotonesCategorias();
 });
 
@@ -111,7 +112,8 @@ function inicializarTema() {
     const card = document.querySelector('.card');
     const navbar = document.querySelector('header');
     const footer = document.querySelector('footer');
-
+    const botonTecl = document.getElementById('btn-teclados');
+    const botonMous = document.getElementById('btn-mouses');
 
     if (temaGuardado === 'dark') {
         if (main) {
@@ -120,6 +122,16 @@ function inicializarTema() {
         }
         body.classList.remove('bg-body-secondary');
         body.classList.add('bg-dark', 'text-white');
+
+        if (botonTecl) {
+            botonTecl.classList.remove('btn-dark');
+            botonTecl.classList.add('bg-completly-black');
+        }
+
+        if (botonMous) {
+            botonMous.classList.remove('btn-dark');
+            botonMous.classList.add('bg-completly-black');
+        }
 
         if (card) {
             card.classList.remove('bg-light');
@@ -175,6 +187,8 @@ function cambiarTema() {
     const card = document.querySelector('.card');
     const navbar = document.querySelector('header');
     const footer = document.querySelector('footer');
+    const botonTecl = document.getElementById('btn-teclados');
+    const botonMous = document.getElementById('btn-mouses');
 
     if (nuevo === 'dark') {
         if (main) {
@@ -184,6 +198,16 @@ function cambiarTema() {
 
         body.classList.remove('bg-body-secondary');
         body.classList.add('bg-dark', 'text-white');
+
+        if (botonTecl) {
+            botonTecl.classList.remove('btn-dark');
+            botonTecl.classList.add('bg-completly-black');
+        }
+
+        if (botonMous) {
+            botonMous.classList.remove('btn-dark');
+            botonMous.classList.add('bg-completly-black');
+        }
 
         if (card) {
             card.classList.remove('bg-light');
@@ -258,7 +282,9 @@ async function mostrarTeclados() {
         const productos = await res.json();
         console.log('Productos obtenidos:', productos);
 
-        const teclados = productos.filter(p => p.categoria === 'teclado');
+        const teclados = productos.filter(p => p.type === 'teclado');
+        console.log('Teclados filtrados:', teclados);
+
         const contenedor = document.querySelector('#seccion-teclados .row');
         if (!contenedor) return;
 
@@ -270,13 +296,13 @@ async function mostrarTeclados() {
 
             col.innerHTML = `
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                    <img src="${teclado.imagen}" class="card-img-top" alt="${teclado.nombre}" />
+                    <img src="${teclado.imageUrl}" class="card-img-top" alt="${teclado.name}" />
                     <div class="card-body">
-                        <h5 class="card-title">${teclado.nombre}</h5>
-                        <p class="card-text">Tipo: ${teclado.tipo}</p>
-                        <p class="card-text">Precio: $${teclado.precio}</p>
-                        <p class="card-text text-success">Estado: ${teclado.estado}</p>
-                        <p class="card-text">${teclado.descripcion}</p>
+                        <h5 class="card-title">${teclado.name}</h5>
+                        <p class="card-text">Tipo: ${teclado.type}</p>
+                        <p class="card-text">Precio: $${teclado.price}</p>
+                        <p class="card-text text-success">Estado: ${teclado.active}</p>
+                        <p class="card-text">${teclado.description}</p>
                     </div>
                 </div>
             `;
@@ -289,4 +315,47 @@ async function mostrarTeclados() {
     }
 }
 
+async function mostrarMouses() {
+    console.log('Cargando mouses...');
 
+    try {
+        const res = await fetch('http://localhost:3000/api/productos');
+        console.log('Petición a la API de productos realizada');
+
+        if (!res.ok) throw new Error('Error al obtener productos');
+
+        const productos = await res.json();
+        console.log('Productos obtenidos:', productos);
+
+        const mouses = productos.filter(p => p.type === 'mouse');
+        console.log('Mouses filtrados:', mouses);
+
+        const contenedor = document.querySelector('#seccion-mouses .row');
+        if (!contenedor) return;
+
+        contenedor.innerHTML = ''; // Limpiar lo anterior
+
+        mouses.forEach(mouse => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4';
+
+            col.innerHTML = `
+                <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
+                    <img src="${mouse.imageUrl}" class="card-img-top" alt="${mouse.name}" />
+                    <div class="card-body">
+                        <h5 class="card-title ">${mouse.name}</h5>
+                        <p class="card-text ">Tipo: ${mouse.type}</p>
+                        <p class="card-text ">Precio: $${mouse.price}</p>
+                        <p class="card-text text-success">Estado: ${mouse.active}</p>
+                        <p class="card-text ">${mouse.description}</p>
+                    </div>
+                </div>
+            `;
+
+            contenedor.appendChild(col);
+        });
+
+    } catch (err) {
+        console.error('Error al cargar mouses:', err);
+    }
+}
