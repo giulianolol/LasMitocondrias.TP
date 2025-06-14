@@ -59,14 +59,9 @@ header {
     cursor: pointer;
 }
 
-
 .nav-link.active-border {
     border-bottom: 3px solid white;
     padding-bottom: 2px;
-}
-
-.card{
-    color: white !important;
 }
 
 .card.bg-dark {

@@ -273,6 +273,15 @@ function mostrarAlerta(mensaje, tipo = "success", duracion = 3000) {
 async function mostrarTeclados() {
     console.log('Cargando teclados...');
 
+    const contenedor = document.querySelector('#seccion-teclados .row');
+    const spinner = document.getElementById('spinner');
+
+    if (!contenedor || !spinner) return;
+
+    // Mostrar spinner y limpiar contenedor
+    spinner.style.display = 'block';
+    contenedor.innerHTML = '';
+
     try {
         const res = await fetch('http://localhost:3000/api/productos');
         console.log('Petición a la API de productos realizada');
@@ -285,11 +294,6 @@ async function mostrarTeclados() {
         const teclados = productos.filter(p => p.type === 'teclado');
         console.log('Teclados filtrados:', teclados);
 
-        const contenedor = document.querySelector('#seccion-teclados .row');
-        if (!contenedor) return;
-
-        contenedor.innerHTML = ''; // Limpiar lo anterior
-
         teclados.forEach(teclado => {
             const col = document.createElement('div');
             col.className = 'col-md-4';
@@ -298,11 +302,11 @@ async function mostrarTeclados() {
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
                     <img src="${teclado.imageUrl}" class="card-img-top" alt="${teclado.name}" />
                     <div class="card-body">
-                        <h5 class="card-title">${teclado.name}</h5>
-                        <p class="card-text">Tipo: ${teclado.type}</p>
-                        <p class="card-text">Precio: $${teclado.price}</p>
+                        <h5 class="card-title text-white">${teclado.name}</h5>
+                        <p class="card-text text-white">Tipo: ${teclado.type}</p>
+                        <p class="card-text text-white">Precio: $${teclado.price}</p>
                         <p class="card-text text-success">Estado: ${teclado.active}</p>
-                        <p class="card-text">${teclado.description}</p>
+                        <p class="card-text text-white">${teclado.description}</p>
                     </div>
                 </div>
             `;
@@ -312,11 +316,23 @@ async function mostrarTeclados() {
 
     } catch (err) {
         console.error('Error al cargar teclados:', err);
+    } finally {
+        // Ocultar el spinner al terminar
+        spinner.style.display = 'none';
     }
 }
 
 async function mostrarMouses() {
     console.log('Cargando mouses...');
+
+    const contenedor = document.querySelector('#seccion-mouses .row');
+    const spinner = document.getElementById('spinner');
+
+    if (!contenedor || !spinner) return;
+
+    // Mostrar spinner y limpiar contenido anterior
+    spinner.style.display = 'block';
+    contenedor.innerHTML = '';
 
     try {
         const res = await fetch('http://localhost:3000/api/productos');
@@ -330,11 +346,6 @@ async function mostrarMouses() {
         const mouses = productos.filter(p => p.type === 'mouse');
         console.log('Mouses filtrados:', mouses);
 
-        const contenedor = document.querySelector('#seccion-mouses .row');
-        if (!contenedor) return;
-
-        contenedor.innerHTML = ''; // Limpiar lo anterior
-
         mouses.forEach(mouse => {
             const col = document.createElement('div');
             col.className = 'col-md-4';
@@ -343,11 +354,11 @@ async function mostrarMouses() {
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
                     <img src="${mouse.imageUrl}" class="card-img-top" alt="${mouse.name}" />
                     <div class="card-body">
-                        <h5 class="card-title ">${mouse.name}</h5>
-                        <p class="card-text ">Tipo: ${mouse.type}</p>
-                        <p class="card-text ">Precio: $${mouse.price}</p>
+                        <h5 class="card-title">${mouse.name}</h5>
+                        <p class="card-text">Tipo: ${mouse.type}</p>
+                        <p class="card-text">Precio: $${mouse.price}</p>
                         <p class="card-text text-success">Estado: ${mouse.active}</p>
-                        <p class="card-text ">${mouse.description}</p>
+                        <p class="card-text">${mouse.description}</p>
                     </div>
                 </div>
             `;
@@ -357,5 +368,8 @@ async function mostrarMouses() {
 
     } catch (err) {
         console.error('Error al cargar mouses:', err);
+    } finally {
+        // Ocultar spinner
+        spinner.style.display = 'none';
     }
 }
