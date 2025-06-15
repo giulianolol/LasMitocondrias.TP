@@ -378,3 +378,29 @@ async function mostrarMouses() {
         spinner.style.display = 'none';
     }
 }
+
+function imprimirTicket() {
+    const contenido = document.querySelector('.card').innerHTML;
+
+    const ventana = window.open('', '_blank', 'width=800,height=600');
+    ventana.document.write(`
+        <html>
+            <head>
+                <title>Ticket</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <style>
+                    body { margin: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="card mx-auto" style="max-width: 600px;">
+                    ${contenido}
+                </div>
+            </body>
+        </html>
+    `);
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
+}
