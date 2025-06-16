@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     verificarNombre();
     mostrarTeclados();
     mostrarMouses();
+    mostrarTecladosPaginacion();
     configurarBotonesCategorias();
 });
 
@@ -302,16 +303,15 @@ async function mostrarTeclados() {
         teclados.forEach(teclado => {
             const col = document.createElement('div');
             col.className = 'col-md-4';
-
+            console.log('Teclado procesado:', teclado);
             col.innerHTML = `
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                    <img src="${teclado.imageUrl}" class="card-img-top" alt="${teclado.name}" />
+                    <img src="${teclado.imageUrl}" class="card-img-top img-fluid object-fit-cover h-100" alt="${teclado.name}" />
                     <div class="card-body">
                         <h5 class="card-title text-white">${teclado.name}</h5>
                         <p class="card-text text-white">Tipo: ${teclado.type}</p>
                         <p class="card-text text-white">Precio: $${teclado.price}</p>
                         <p class="card-text text-success">Estado: ${teclado.active}</p>
-                        <p class="card-text text-white">${teclado.description}</p>
                     </div>
                 </div>
             `;
@@ -320,9 +320,8 @@ async function mostrarTeclados() {
         });
 
     } catch (err) {
-        console.error('Error al cargar teclados:', err);
+        mostrarAlerta('Error al cargar teclados', 'danger');
     } finally {
-        // Ocultar el spinner al terminar
         spinner.style.display = 'none';
     }
 }
@@ -357,13 +356,12 @@ async function mostrarMouses() {
 
             col.innerHTML = `
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                    <img src="${mouse.imageUrl}" class="card-img-top" alt="${mouse.name}" />
+                    <img src="${mouse.imageUrl}" class="card-img-top img-fluid object-fit-cover h-100" alt="${mouse.name}" />
                     <div class="card-body">
                         <h5 class="card-title">${mouse.name}</h5>
                         <p class="card-text">Tipo: ${mouse.type}</p>
                         <p class="card-text">Precio: $${mouse.price}</p>
                         <p class="card-text text-success">Estado: ${mouse.active}</p>
-                        <p class="card-text">${mouse.description}</p>
                     </div>
                 </div>
             `;
@@ -372,44 +370,13 @@ async function mostrarMouses() {
         });
 
     } catch (err) {
-        console.error('Error al cargar mouses:', err);
+        mostrarAlerta('Error al cargar mouses', 'danger');
     } finally {
-        // Ocultar spinner
         spinner.style.display = 'none';
     }
 }
 
-function imprimirTicket() {
-    const contenido = document.querySelector('.card').innerHTML;
-
-    const ventana = window.open('', '_blank', 'width=800,height=600');
-    ventana.document.write(`
-        <html>
-            <head>
-                <title>Ticket</title>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-                <style>
-                    body { margin: 20px; }
-                </style>
-            </head>
-            <body>
-                <div class="card mx-auto" style="max-width: 600px;">
-                    ${contenido}
-                </div>
-            </body>
-        </html>
-    `);
-    ventana.document.close();
-    ventana.focus();
-    ventana.print();
-    ventana.close();
-}
-
-let tecladosGlobal = [];
-let paginaActual = 1;
-const tecladosPorPagina = 6;
-
-async function mostrarTeclados() {
+async function mostrarTecladosPaginacion() {
     const contenedor = document.querySelector('#seccion-teclados .row');
     const spinner = document.getElementById('spinner');
 
@@ -434,6 +401,9 @@ async function mostrarTeclados() {
     }
 }
 
+let tecladosGlobal = [];
+let paginaActual = 1;
+const tecladosPorPagina = 6;
 function renderizarPaginaTeclados() {
     const contenedor = document.querySelector('#seccion-teclados .row');
     const paginador = document.getElementById('paginador');
@@ -485,4 +455,30 @@ function renderizarControlesPaginacion() {
         });
         paginador.appendChild(btn);
     }
+}
+
+function imprimirTicket() {
+    const contenido = document.querySelector('.card').innerHTML;
+
+    const ventana = window.open('', '_blank', 'width=800,height=600');
+    ventana.document.write(`
+        <html>
+            <head>
+                <title>Ticket</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <style>
+                    body { margin: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="card mx-auto" style="max-width: 600px;">
+                    ${contenido}
+                </div>
+            </body>
+        </html>
+    `);
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
 }
