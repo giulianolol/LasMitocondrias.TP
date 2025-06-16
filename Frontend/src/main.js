@@ -404,3 +404,85 @@ function imprimirTicket() {
     ventana.print();
     ventana.close();
 }
+
+let tecladosGlobal = [];
+let paginaActual = 1;
+const tecladosPorPagina = 6;
+
+async function mostrarTeclados() {
+    const contenedor = document.querySelector('#seccion-teclados .row');
+    const spinner = document.getElementById('spinner');
+
+    if (!contenedor || !spinner) return;
+
+    spinner.style.display = 'block';
+    contenedor.innerHTML = '';
+
+    try {
+        const res = await fetch('http://localhost:3000/api/productos');
+        if (!res.ok) throw new Error('Error al obtener productos');
+
+        const productos = await res.json();
+        tecladosGlobal = productos.filter(p => p.type === 'teclado');
+        paginaActual = 1;
+        renderizarPaginaTeclados();
+
+    } catch (err) {
+        mostrarAlerta('Error al cargar teclados', 'danger');
+    } finally {
+        spinner.style.display = 'none';
+    }
+}
+
+function renderizarPaginaTeclados() {
+    const contenedor = document.querySelector('#seccion-teclados .row');
+    const paginador = document.getElementById('paginador');
+    contenedor.innerHTML = '';
+
+    const inicio = (paginaActual - 1) * tecladosPorPagina;
+    const tecladosPagina = tecladosGlobal.slice(inicio, inicio + tecladosPorPagina);
+
+    tecladosPagina.forEach(teclado => {
+        const col = document.createElement('div');
+        col.className = 'col-md-4';
+        col.innerHTML = `
+            <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
+                <img src="${teclado.imageUrl}" class="card-img-top" alt="${teclado.name}" />
+                <div class="card-body">
+                    <h5 class="card-title">${teclado.name}</h5>
+                    <p class="card-text">Tipo: ${teclado.type}</p>
+                    <p class="card-text">Precio: $${teclado.price}</p>
+                    <p class="card-text text-success">Estado: ${teclado.active}</p>
+                    <p class="card-text">${teclado.description}</p>
+                </div>
+            </div>
+        `;
+        contenedor.appendChild(col);
+    });
+
+    renderizarControlesPaginacion();
+}
+
+function renderizarControlesPaginacion() {
+    let paginador = document.getElementById('paginador');
+    if (!paginador) {
+        paginador = document.createElement('div');
+        paginador.id = 'paginador';
+        paginador.className = 'text-center mt-4';
+        document.querySelector('#seccion-teclados').appendChild(paginador);
+    }
+
+    paginador.innerHTML = '';
+
+    const totalPaginas = Math.ceil(tecladosGlobal.length / tecladosPorPagina);
+    for (let i = 1; i <= totalPaginas; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = `btn btn-sm mx-1 ${i === paginaActual ? 'btn-primary' : 'btn-secondary'}`;
+        btn.addEventListener('click', () => {
+            paginaActual = i;
+            renderizarPaginaTeclados();
+        });
+        paginador.appendChild(btn);
+    }
+}
