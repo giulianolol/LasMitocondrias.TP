@@ -12,6 +12,9 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
+
+     <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>  <!-- alertas -->
+
     <header class="bg-dark text-white">
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
@@ -40,7 +43,12 @@
                             <a href="productos.html" class="nav-link fw-bold">Productos</a>
                         </li>
                         <li class="nav-item">
-                            <a href="carrito.html" class="nav-link fw-bold">Carrito</a>
+                            <a href="carrito.html" class="nav-link fw-bold position-relative">
+                                Carrito
+                                <span id="carrito-contador" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                                    0
+                                </span>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a href="ticket.html" class="nav-link fw-bold">Ticket</a>

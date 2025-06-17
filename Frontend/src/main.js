@@ -8,10 +8,54 @@ document.addEventListener("DOMContentLoaded", () => {
     mostrarMouses();
     mostrarTecladosPaginacion();
     configurarBotonesCategorias();
+    inicializarCarrito();
+    actualizarContadorCarrito();
     document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
     document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
 
 });
+
+let carrito = JSON.parse(localStorage.getItem('carrito')) || []
+
+function inicializarCarrito() {
+    // Cargar carrito desde localStorage si existe
+    const carritoGuardado = localStorage.getItem('carrito');
+    if (carritoGuardado) {
+        carrito = JSON.parse(carritoGuardado);
+    }
+}
+
+function guardarCarrito() {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+}
+
+function agregarAlCarrito(producto) {
+    // Verificar si el producto ya existe en el carrito
+    const productoExistente = carrito.find(item => item.id === producto.id);
+    
+    if (productoExistente) {
+        productoExistente.cantidad += 1;
+        mostrarAlerta(`Se agregó otra unidad de ${producto.name} al carrito`, "info");
+    } else {
+        carrito.push({
+            ...producto,
+            cantidad: 1
+        });
+        mostrarAlerta(`${producto.name} agregado al carrito`, "success");
+    }
+    
+    guardarCarrito();
+    actualizarContadorCarrito();
+}
+
+function actualizarContadorCarrito() {
+    const contador = document.getElementById('contador-carrito');
+    if (contador) {
+        const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+        contador.textContent = totalItems;
+        contador.style.display = totalItems > 0 ? 'inline' : 'none';
+    }
+}
 
 function resaltarNavActivo() {
     const paginaActual = location.pathname.split("/").pop().toLowerCase();
@@ -359,12 +403,17 @@ async function mostrarMouses() {
 
             col.innerHTML = `
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                    <img src="${mouse.imageUrl}" class="card-img-top img-fluid object-fit-cover h-100" alt="${mouse.name}" />
-                    <div class="card-body">
+                    <img src="${mouse.imageUrl}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${mouse.name}" />
+                    <div class="card-body d-flex flex-column">
                         <h5 class="card-title">${mouse.name}</h5>
                         <p class="card-text">Tipo: ${mouse.type}</p>
                         <p class="card-text">Precio: $${mouse.price}</p>
                         <p class="card-text text-success">Estado: ${mouse.active}</p>
+                        <div class="mt-auto">
+                            <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(mouse).replace(/"/g, '&quot;')})">
+                                <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -407,9 +456,9 @@ async function mostrarTecladosPaginacion() {
 let tecladosGlobal = [];
 let paginaActual = 1;
 const tecladosPorPagina = 6;
+
 function renderizarPaginaTeclados() {
     const contenedor = document.querySelector('#seccion-teclados .row');
-    const paginador = document.getElementById('paginador');
     contenedor.innerHTML = '';
 
     const inicio = (paginaActual - 1) * tecladosPorPagina;
@@ -417,19 +466,26 @@ function renderizarPaginaTeclados() {
 
     tecladosPagina.forEach(teclado => {
         const col = document.createElement('div');
-        col.className = 'col-md-4';
+        col.className = 'col-md-4 mb-4';
         col.innerHTML = `
             <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                <img src="${teclado.imageUrl}" class="card-img-top" alt="${teclado.name}" />
-                <div class="card-body">
+                <img src="${teclado.imageUrl}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${teclado.name}" />
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${teclado.name}</h5>
                     <p class="card-text">Tipo: ${teclado.type}</p>
                     <p class="card-text">Precio: $${teclado.price}</p>
                     <p class="card-text text-success">Estado: ${teclado.active}</p>
+                    <div class="mt-auto">
+                        <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(teclado).replace(/"/g, '&quot;')})">
+                            <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
+
         contenedor.appendChild(col);
+
     });
 
     renderizarControlesPaginacion();
@@ -514,8 +570,7 @@ let mousesGlobal = [];
 let paginaMouses = 1;
 const mousesPorPagina = 6;
 function renderizarPaginaMouses() {
-    const contenedor = document.querySelector('#seccion-mouses .row');
-    const paginador = document.getElementById('paginacion-mouses');
+const contenedor = document.querySelector('#seccion-mouses .row');
     contenedor.innerHTML = '';
 
     const inicio = (paginaMouses - 1) * mousesPorPagina;
@@ -523,15 +578,20 @@ function renderizarPaginaMouses() {
 
     mousesPagina.forEach(mouse => {
         const col = document.createElement('div');
-        col.className = 'col-md-4';
+        col.className = 'col-md-4 mb-4';
         col.innerHTML = `
             <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                <img src="${mouse.imageUrl}" class="card-img-top" alt="${mouse.name}" />
-                <div class="card-body">
+                <img src="${mouse.imageUrl}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${mouse.name}" />
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${mouse.name}</h5>
                     <p class="card-text">Tipo: ${mouse.type}</p>
                     <p class="card-text">Precio: $${mouse.price}</p>
                     <p class="card-text text-success">Estado: ${mouse.active}</p>
+                    <div class="mt-auto">
+                        <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(mouse).replace(/"/g, '&quot;')})">
+                            <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -568,4 +628,34 @@ function mostrarSeccionMouses() {
     document.getElementById('seccion-teclados').style.display = 'none';
     document.getElementById('seccion-mouses').style.display = 'block';
     mostrarMousesPaginacion();
+}
+
+function obtenerCarrito() {
+    return carrito;
+}
+
+function vaciarCarrito() {
+    carrito = [];
+    guardarCarrito();
+    actualizarContadorCarrito();
+    mostrarAlerta('Carrito vaciado', 'info');
+}
+
+function eliminarDelCarrito(productoId) {
+    const index = carrito.findIndex(item => item.id === productoId);
+    if (index > -1) {
+        const producto = carrito[index];
+        if (producto.cantidad > 1) {
+            producto.cantidad -= 1;
+        } else {
+            carrito.splice(index, 1);
+        }
+        guardarCarrito();
+        actualizarContadorCarrito();
+        mostrarAlerta('Producto eliminado del carrito', 'info');
+    }
+}
+
+function calcularTotalCarrito() {
+    return carrito.reduce((total, item) => total + (item.price * item.cantidad), 0);
 }
