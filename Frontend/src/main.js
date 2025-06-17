@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     mostrarMouses();
     mostrarTecladosPaginacion();
     configurarBotonesCategorias();
+    document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
+    document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
+
 });
 
 function resaltarNavActivo() {
@@ -423,7 +426,6 @@ function renderizarPaginaTeclados() {
                     <p class="card-text">Tipo: ${teclado.type}</p>
                     <p class="card-text">Precio: $${teclado.price}</p>
                     <p class="card-text text-success">Estado: ${teclado.active}</p>
-                    <p class="card-text">${teclado.description}</p>
                 </div>
             </div>
         `;
@@ -481,4 +483,89 @@ function imprimirTicket() {
     ventana.focus();
     ventana.print();
     ventana.close();
+}
+
+async function mostrarMousesPaginacion() {
+    const contenedor = document.querySelector('#seccion-mouses .row');
+    const spinner = document.getElementById('spinner');
+
+    if (!contenedor || !spinner) return;
+
+    spinner.style.display = 'block';
+    contenedor.innerHTML = '';
+
+    try {
+        const res = await fetch('http://localhost:3000/api/productos');
+        if (!res.ok) throw new Error('Error al obtener productos');
+
+        const productos = await res.json();
+        mousesGlobal = productos.filter(p => p.type === 'mouse');
+        paginaMouses = 1;
+        renderizarPaginaMouses();
+
+    } catch (err) {
+        mostrarAlerta('Error al cargar mouses', 'danger');
+    } finally {
+        spinner.style.display = 'none';
+    }
+}
+
+let mousesGlobal = [];
+let paginaMouses = 1;
+const mousesPorPagina = 6;
+function renderizarPaginaMouses() {
+    const contenedor = document.querySelector('#seccion-mouses .row');
+    const paginador = document.getElementById('paginacion-mouses');
+    contenedor.innerHTML = '';
+
+    const inicio = (paginaMouses - 1) * mousesPorPagina;
+    const mousesPagina = mousesGlobal.slice(inicio, inicio + mousesPorPagina);
+
+    mousesPagina.forEach(mouse => {
+        const col = document.createElement('div');
+        col.className = 'col-md-4';
+        col.innerHTML = `
+            <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
+                <img src="${mouse.imageUrl}" class="card-img-top" alt="${mouse.name}" />
+                <div class="card-body">
+                    <h5 class="card-title">${mouse.name}</h5>
+                    <p class="card-text">Tipo: ${mouse.type}</p>
+                    <p class="card-text">Precio: $${mouse.price}</p>
+                    <p class="card-text text-success">Estado: ${mouse.active}</p>
+                </div>
+            </div>
+        `;
+        contenedor.appendChild(col);
+    });
+
+    renderizarControlesPaginacionMouses();
+}
+
+function renderizarControlesPaginacionMouses() {
+    const paginador = document.getElementById('paginacion-mouses');
+    paginador.innerHTML = '';
+
+    const totalPaginas = Math.ceil(mousesGlobal.length / mousesPorPagina);
+    for (let i = 1; i <= totalPaginas; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = `btn btn-sm mx-1 ${i === paginaMouses ? 'btn-primary' : 'btn-secondary'}`;
+        btn.addEventListener('click', () => {
+            paginaMouses = i;
+            renderizarPaginaMouses();
+        });
+        paginador.appendChild(btn);
+    }
+}
+
+function mostrarSeccionTeclados() {
+    document.getElementById('seccion-teclados').style.display = 'block';
+    document.getElementById('seccion-mouses').style.display = 'none';
+    mostrarTecladosPaginacion();
+}
+
+function mostrarSeccionMouses() {
+    document.getElementById('seccion-teclados').style.display = 'none';
+    document.getElementById('seccion-mouses').style.display = 'block';
+    mostrarMousesPaginacion();
 }
