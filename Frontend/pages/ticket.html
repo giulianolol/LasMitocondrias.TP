@@ -18,7 +18,7 @@
             <div class="container-fluid">
 
                 <div id="logo-text" class="d-flex align-items-center mb-2 mb-lg-0">
-                    <a href="../index.html">
+                    <a onclick="eliminarDelLocalStorage('nombreCliente'); eliminarDelLocalStorage('carrito');" href="../index.html">
                         <img src="../assets/img/logo.png" alt="Logo" style="width: 80px; height: 80px;" />
                     </a>
                     <div class="navbar-center">
@@ -39,11 +39,11 @@
                         <button id="botonTema" class="btn btn-outline-light" onclick="cambiarTema()">
                             🌙 Oscuro
                         </button>
-                        <li class="nav-item"><a href="../index.html" class="nav-link fw-bold">Salir</a></li>
+                        <li class="nav-item"><a href="../index.html" onclick="eliminarDelLocalStorage('nombreCliente'); eliminarDelLocalStorage('carrito');" class="nav-link fw-bold">Salir</a></li>
                         <li class="nav-item"><a href="productos.html" onclick="return false" class="nav-link fw-bold">Productos</a>
                         </li>
                         <li class="nav-item"><a href="carrito.html" onclick="return false" class="nav-link fw-bold">Carrito</a></li>
-                        <li class="nav-item"><a href="ticket.html" class="nav-link fw-bold">Ticket</a></li>
+                        <li class="nav-item"><a href="ticket.html"  class="nav-link fw-bold">Ticket</a></li>
                     </ul>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                 </table>
                 <div class="text-center d-flex justify-content-center gap-3 mt-4">
                     <button class="btn btn-dark" onclick="imprimirTicket()">Descargar Ticket</button>
-                    <a href="../index.html" class="btn btn-dark">Salir</a>
+                    <a href="../index.html" onclick="eliminarDelLocalStorage('nombreCliente'); eliminarDelLocalStorage('carrito');" class="btn btn-dark">Salir</a>
                 </div>
             </div>
         </div>

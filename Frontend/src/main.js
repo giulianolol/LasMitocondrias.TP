@@ -206,11 +206,13 @@ function actualizarContadorCarrito() {
 
 function procederCompra() {
     // Pregunto al usuario si está seguro
-    const confirmado = window.confirm("¿Estás seguro de que quieres finalizar la compra?");
+    // const confirmado = window.confirm("¿Estás seguro de que quieres finalizar la compra?");
+    const confirmado = true; // Para pruebas, siempre confirmo
     if (confirmado) {
         //redirijo
-        window.location.href = "http://127.0.0.1:5500/Frontend/pages/ticket.html";
-    } else {
+        window.location.href = "http://127.0.0.1:5500/Frontend/pages/ticket.html";     
+    }            
+     else {
         //  aviso opcional
         mostrarAlerta("No se completó la compra", "info");
     }
@@ -829,3 +831,7 @@ function mostrarSeccionMouses() {
 }
 
 // console.log(carritoTest)
+
+function eliminarDelLocalStorage(clave) {
+    localStorage.removeItem(clave);
+}
