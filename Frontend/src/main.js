@@ -869,3 +869,24 @@ async function mostrarProductos() {
         if (spinner) spinner.style.display = 'none';
     }
 }
+
+async function eliminarProducto(id) {
+    const confirmado = confirm(`¿Estás seguro de eliminar el producto con ID ${id}?`);
+
+    if (!confirmado) return;
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (!res.ok) throw new Error('No se pudo eliminar el producto');
+
+        alert('Producto eliminado correctamente');
+        mostrarProductos(); // Volver a cargar la tabla
+
+    } catch (error) {
+        console.error('Error al eliminar producto:', error);
+        alert('Error al eliminar el producto');
+    }
+}
