@@ -29,7 +29,6 @@ function inicializarCarrito() {
     console.log(carrito)
 }
 
-
 function renderizarCarrito() {
     const contenidoCarrito = document.getElementById('carrito-contenido');
     const carritoVacio = document.getElementById('carrito-vacio');
@@ -142,21 +141,12 @@ function eliminarDelCarrito(productoId) {
     }
 }
 
-function confirmarVaciarCarrito() {
-    const modal = new bootstrap.Modal(document.getElementById('modalVaciarCarrito'));
-    modal.show();
-}
-
-function vaciarCarritoConfirmado() {
+function vaciarCarritoConfirmado() {   
     carrito = [];
     guardarCarrito();
     actualizarContadorCarrito();
     renderizarCarrito();
     mostrarAlerta('Carrito vaciado completamente', 'success');
-    
-    // Cerrar el modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modalVaciarCarrito'));
-    modal.hide();
 }
 
 function procederCompra() {
@@ -486,7 +476,7 @@ function cambiarTema() {
         body.classList.add('bg-body-secondary');
 
         if (card) {
-            card.classList.remove('bg-secondary', 'text-white');
+            card.classList.remove('bg-secondary');
             card.classList.add('bg-light');
         }
 

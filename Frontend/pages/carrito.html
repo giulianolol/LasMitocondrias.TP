@@ -101,7 +101,7 @@
                                         <button id="btn-proceder-compra" class="btn btn-success btn-lg" onclick="procederCompra()">
                                             <i class="fas fa-credit-card me-2"></i>Finalizar Compra
                                         </button>
-                                        <button id="btn-vaciar-carrito" class="btn btn-outline-danger" onclick="confirmarVaciarCarrito()">
+                                        <button id="btn-vaciar-carrito" class="btn btn-outline-danger" onclick="vaciarCarritoConfirmado()">
                                             <i class="fas fa-trash me-2"></i>Vaciar Carrito
                                         </button>
                                     </div>
@@ -113,25 +113,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Modal para confirmar vaciar carrito PREGUNTAR SI SE PODÍA USAR MODAL -->
-    <div class="modal fade" id="modalVaciarCarrito" tabindex="-1" aria-labelledby="modalVaciarCarritoLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalVaciarCarritoLabel">Confirmar acción</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que quieres vaciar el carrito? Esta acción no se puede deshacer.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" onclick="vaciarCarritoConfirmado()">Vaciar Carrito</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         <p class="mb-0">© 2025 Las Mitocondrias</p>
