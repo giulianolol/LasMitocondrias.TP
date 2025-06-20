@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     configurarBotonesCategorias();
     inicializarCarrito();
     actualizarContadorCarrito();
+    mostrarProductos();
     //Solo renderiza el carrito cuando estamos en la página del carrito
     if (document.getElementById('carrito-contenido')) {
         renderizarCarrito();
@@ -112,7 +113,7 @@ function cambiarCantidad(productoId, cambio) {
     if (!producto) return;
 
     const nuevaCantidad = producto.cantidad + cambio;
-    
+
     if (nuevaCantidad <= 0) {
         eliminarDelCarrito(productoId);
     } else {
@@ -120,7 +121,7 @@ function cambiarCantidad(productoId, cambio) {
         guardarCarrito();
         actualizarContadorCarrito();
         renderizarCarrito();
-        
+
         if (cambio > 0) {
             mostrarAlerta(`Se agregó una unidad más de ${producto.name}`, "info");
         } else {
@@ -141,7 +142,7 @@ function eliminarDelCarrito(productoId) {
     }
 }
 
-function vaciarCarritoConfirmado() {   
+function vaciarCarritoConfirmado() {
     carrito = [];
     guardarCarrito();
     actualizarContadorCarrito();
@@ -154,7 +155,7 @@ function procederCompra() {
         mostrarAlerta('Tu carrito está vacío', 'warning');
         return;
     }
-    
+
     // Guardar información de la compra para el ticket
     const compra = {
         productos: [...carrito],
@@ -162,16 +163,16 @@ function procederCompra() {
         fecha: obtenerFecha(),
         cliente: localStorage.getItem('nombreCliente') || 'Cliente'
     };
-    
+
     localStorage.setItem('ultimaCompra', JSON.stringify(compra));
-    
+
     // Limpiar carrito
     carrito = [];
     guardarCarrito();
     actualizarContadorCarrito();
-    
+
     mostrarAlerta('¡Compra realizada con éxito! Redirigiendo al ticket...', 'success');
-    
+
     setTimeout(() => {
         window.location.href = 'ticket.html';
     }, 2000);
@@ -185,7 +186,7 @@ function actualizarContadorCarrito() {
         contadorNav.textContent = totalItems;
         contadorNav.style.display = totalItems > 0 ? 'inline' : 'none';
     }
-    
+
     // Actualizar contador en página de carrito si existe
     const contadorCarrito = document.getElementById('contador-items');
     if (contadorCarrito) {
@@ -200,9 +201,9 @@ function procederCompra() {
     const confirmado = true; // Para pruebas, siempre confirmo
     if (confirmado) {
         //redirijo
-        window.location.href = "http://127.0.0.1:5500/Frontend/pages/ticket.html";     
-    }            
-     else {
+        window.location.href = "http://127.0.0.1:5500/Frontend/pages/ticket.html";
+    }
+    else {
         //  aviso opcional
         mostrarAlerta("No se completó la compra", "info");
     }
@@ -211,7 +212,7 @@ function procederCompra() {
 
 function agregarAlCarrito(producto) {
     const productoExistente = carrito.find(item => item.id === producto.id);
-    
+
     if (productoExistente) {
         productoExistente.cantidad += 1;
         mostrarAlerta(`Se agregó otra unidad de ${producto.name} al carrito (${productoExistente.cantidad} unidades)`, "info");
@@ -222,7 +223,7 @@ function agregarAlCarrito(producto) {
         });
         mostrarAlerta(`${producto.name} agregado al carrito`, "success");
     }
-    
+
     guardarCarrito();
     actualizarContadorCarrito();
     renderizarCarrito(); // Actualizar vista si estamos en la página del carrito
@@ -300,7 +301,7 @@ function configurarBotonesCategorias() {
 
 function mostrarSeccion(seccion) {
     const seccionTeclados = document.getElementById("seccion-teclados");
-    const seccionMouses   = document.getElementById("seccion-mouses");
+    const seccionMouses = document.getElementById("seccion-mouses");
     if (!seccionTeclados || !seccionMouses) return;  // <-- CORTO si no existen, SINO CRASHEA Y NO LLEGA A MOSTRAR EL CARRITO
 
     if (seccion === "teclados") {
@@ -314,7 +315,7 @@ function mostrarSeccion(seccion) {
 
 function configurarBotonesCategorias() {
     const btnTeclados = document.getElementById("btn-teclados");
-    const btnMouses   = document.getElementById("btn-mouses");
+    const btnMouses = document.getElementById("btn-mouses");
     if (!btnTeclados || !btnMouses) return;  // <-- CORTO si no existen, SINO CRASHEA Y NO LLEGA A MOSTRAR EL CARRITO
 
     btnTeclados.addEventListener("click", () => mostrarSeccion("teclados"));
@@ -377,7 +378,7 @@ function inicializarTema() {
 
         if (card) {
             card.classList.remove('bg-light');
-            card.classList.add('bg-secondary', 'text-white');
+            card.classList.add('bg-dark', 'text-white');
         }
 
         if (navbar) {
@@ -398,7 +399,7 @@ function inicializarTema() {
         body.classList.add('bg-body-secondary');
 
         if (card) {
-            card.classList.remove('bg-secondary', 'text-white');
+            card.classList.remove('bg-dark', 'text-white');
             card.classList.add('bg-light');
         }
 
@@ -760,7 +761,7 @@ let paginaMouses = 1;
 const mousesPorPagina = 6;
 
 function renderizarPaginaMouses() {
-const contenedor = document.querySelector('#seccion-mouses .row');
+    const contenedor = document.querySelector('#seccion-mouses .row');
     contenedor.innerHTML = '';
 
     const inicio = (paginaMouses - 1) * mousesPorPagina;
@@ -824,4 +825,47 @@ function mostrarSeccionMouses() {
 
 function eliminarDelLocalStorage(clave) {
     localStorage.removeItem(clave);
+}
+
+async function mostrarProductos() {
+    console.log('Cargando productos...');
+
+    const tbody = document.getElementById('tabla-productos');
+    const spinner = document.getElementById('spinner'); // opcional: si tenés un spinner global
+
+    if (!tbody) return;
+
+    if (spinner) spinner.style.display = 'block';
+    tbody.innerHTML = '';
+
+    try {
+        const res = await fetch('http://localhost:3000/api/productos');
+        if (!res.ok) throw new Error('Error al obtener productos');
+
+        const productos = await res.json();
+        console.log('Productos obtenidos:', productos);
+
+        productos.forEach(producto => {
+            const fila = document.createElement('tr');
+
+            fila.innerHTML = `
+                <td>${producto.id}</td>
+                <td>${producto.name}</td>
+                <td>$${producto.price}</td>
+                <td>${producto.active ? 'Sí' : 'No'}</td>
+                <td>
+                    <a href="modificaciones.html?id=${producto.id}" class="btn btn-sm btn-warning">Modificar</a>
+                    <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id})">Eliminar</button>
+                </td>
+            `;
+
+            tbody.appendChild(fila);
+        });
+
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta('Error al cargar productos', 'danger');
+    } finally {
+        if (spinner) spinner.style.display = 'none';
+    }
 }
