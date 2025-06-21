@@ -425,72 +425,8 @@ function cambiarTema() {
         botonTema.textContent = nuevo === 'dark' ? '🌞' : '🌙';
     }
 
-    const main = document.querySelector('main');
-    const body = document.body;
-    const card = document.querySelector('.card');
-    const navbar = document.querySelector('header');
-    const footer = document.querySelector('footer');
-    const botonTecl = document.getElementById('btn-teclados');
-    const botonMous = document.getElementById('btn-mouses');
+    inicializarTema();
 
-    if (nuevo === 'dark') {
-        if (main) {
-            main.classList.remove('bg-body-secondary');
-            main.classList.add('bg-dark', 'text-white');
-        }
-
-        body.classList.remove('bg-body-secondary');
-        body.classList.add('bg-dark', 'text-white');
-
-        if (botonTecl) {
-            botonTecl.classList.remove('btn-dark');
-            botonTecl.classList.add('bg-completly-black');
-        }
-
-        if (botonMous) {
-            botonMous.classList.remove('btn-dark');
-            botonMous.classList.add('bg-completly-black');
-        }
-
-        if (card) {
-            card.classList.remove('bg-light');
-            card.classList.add('bg-secondary', 'text-white');
-        }
-
-        if (navbar) {
-            navbar.classList.remove('bg-dark', 'bg-primary', 'text-white');
-            navbar.classList.add('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
-        }
-
-        if (footer) {
-            footer.classList.remove('bg-dark', 'bg-primary', 'text-white');
-            footer.classList.add('bg-completly-black', 'text-white', 'sombra-suave', 'borde-superior');
-        }
-
-    } else {
-        if (main) {
-            main.classList.remove('bg-dark', 'text-white');
-            main.classList.add('bg-body-secondary');
-        }
-
-        body.classList.remove('bg-dark', 'text-white');
-        body.classList.add('bg-body-secondary');
-
-        if (card) {
-            card.classList.remove('bg-secondary');
-            card.classList.add('bg-light');
-        }
-
-        if (navbar) {
-            navbar.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
-            navbar.classList.add('bg-dark', 'text-white');
-        }
-
-        if (footer) {
-            footer.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-superior');
-            footer.classList.add('bg-dark', 'text-white');
-        }
-    }
 }
 
 function mostrarAlerta(mensaje, tipo = "success", duracion = 3000) {
