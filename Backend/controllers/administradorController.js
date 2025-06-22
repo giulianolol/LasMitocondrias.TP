@@ -11,14 +11,16 @@ const Administrator = db.Administrator;
  */
 exports.registerAdministrator = async (req, res) => {
   try {
+    // validación de email y password
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
 
-    // Verificar si ya existe un admin con ese email
+    // Verificar si ya existe un admin con ese email con el findOne
     const existente = await Administrator.findOne({ where: { email } });
     if (existente) {
+      // 409 es un código que hace referencia a Conflict para indicar que el email ya está registrado
       return res.status(409).json({ error: 'El email ya está registrado' });
     }
 
@@ -28,9 +30,11 @@ exports.registerAdministrator = async (req, res) => {
 
     // Crear el administrador
     const nuevoAdmin = await Administrator.create({ email, passwordHash });
+    //si sale bien retorna un 201
     return res.status(201).json({ id: nuevoAdmin.id, email: nuevoAdmin.email });
   } catch (err) {
     console.error('Error en registerAdministrator:', err);
+    //si sale mal retorna un 500
     return res.status(500).json({ error: err.message || 'Error al registrar administrador' });
   }
 };
@@ -58,7 +62,7 @@ exports.loginAdministrator = async (req, res, next) => {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    // Crear sesión: guardamos el id del administrador en la sesión
+    // guardamos el id del administrador en la propiedad adminId de la sesión
     req.session.adminId = admin.id;
     // return res.json({ message: 'Login exitoso', email: admin.email });
     return next();
@@ -80,8 +84,8 @@ exports.logoutAdministrator = async (req, res, next) => {
         console.error('Error al destruir sesión:', err);
         return res.status(500).json({ error: 'No se pudo cerrar sesión' });
       }
-      // Opcional: limpiar cookie en el frontend
-      res.clearCookie('connect.sid');
+      // limpiar cookie en el frontend
+      // res.clearCookie('connect.sid');
       // return res.json({ message: 'Logout exitoso' });
       return next()
     });

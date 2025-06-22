@@ -1,5 +1,5 @@
 require('dotenv').config();
-const cors = require('cors');
+const cors = require('cors'); //habilitamos peticiones desde el frontend con diferente origen (lo que mostró el profe con windsurf)
 const path = require('path')
 const express = require('express');
 const session = require('express-session');
@@ -7,14 +7,15 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const methodOverride = require('method-override')
 
 // Importar la conexión y modelos
-const db = require('./models');
-const authAdmin = require('./middlewares/authAdmin');
-const adminController = require('./controllers/administradorController')
-const productosController = require('./controllers/productosController');
-const ventasController = require('./controllers/ventasControllers');
-const productosRouter = require('./routes/api/productos');
-const ventasRouter = require('./routes/api/ventas');
+const db = require('./models'); //conexión
+const authAdmin = require('./middlewares/authAdmin'); //modelos
+const adminController = require('./controllers/administradorController') //modelos
+const productosController = require('./controllers/productosController'); //modelos
+const ventasController = require('./controllers/ventasControllers'); //modelos
+const productosRouter = require('./routes/api/productos'); //modelos
+const ventasRouter = require('./routes/api/ventas'); //modelos
 
+//inciamos express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -22,22 +23,23 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method')) //Para PUT/PATCH en formularios
-app.use(cors()); // Middleware para habilitar CORS
+app.use(cors()); // habilitar CORS
 
-// Sessiones - Modelo listo, falta implementar
+// configuración de las sessiones
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     store: new SequelizeStore({ db: db.sequelize }),
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60, sameSite: true },
+    cookie: { maxAge: 1000 * 60 * 60, sameSite: true }, // está configurada para que la cookie dure 1 hora y con politica sameSite
   })
 );
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
+//testear para eliminar
+// app.set('view engine', 'ejs'); 
+// app.set('views', path.join(__dirname, 'views'));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 //Sincronizamos la base y montamos las rutas
 db.sequelize
@@ -59,6 +61,7 @@ db.sequelize
     app.put('/admin/productos/:id', authAdmin, productosController.updateProducto, (req, res) => { res.redirect('/admin/dashboard'); });
     app.post('/admin/productos/:id/toggle', authAdmin, productosController.toggleProducto, (req, res) => { res.redirect('/admin/dashboard'); });
 
+    //estás rutas están protegidas, son de admin
     app.use('/api/administradores', require('./routes/api/administradores')) //RUTA DE ADMIN
     app.use('/api/productos', (req, res, next) => { if (req.method === 'GET') return next(); return authAdmin(req, res, next); }, productosRouter);
     app.use('/api/ventas', (req, res, next) => { if (req.method === 'POST') return next(); return authAdmin(req, res, next); }, ventasRouter);
