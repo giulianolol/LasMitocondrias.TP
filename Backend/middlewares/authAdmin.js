@@ -1,11 +1,22 @@
 // Backend/middlewares/authAdmin.js
 
+const jwt = require('jsonwebtoken');
+
 module.exports = (req, res, next) => {
-  // Acá comprobamos si existe un objeto `session` en la petición y si tiene una propiedad 'adminId' que sería el id del administrador
-  if (req.session && req.session.adminId) {
-    //Si existe una sesión válida, le decimos a express que siga con el next() para contiunar con el flow/flujo, ya sea otro middleware o ruta x
-    return next();
+  // Extraer token del header Authorization
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // "Bearer TOKEN"
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No autorizado. Token requerido.' });
   }
-  // caso que no haya una sesion de admin, responde con un forbbiden 401 y un json donde especificando que no está autorizado
-  return res.status(401).json({ error: 'No autorizado. Debe iniciar sesión como administrador.' });
+
+  try {
+    // Verificar y decodificar el token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.adminId = decoded.adminId; // Guardar adminId en req para usarlo después
+    return next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Token inválido o expirado.' });
+  }
 };

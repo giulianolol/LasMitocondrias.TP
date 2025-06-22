@@ -1,70 +1,85 @@
 // Backend/controllers/administradorController.js
-
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const db = require('../models');
 const Administrator = db.Administrator;
 
 /**
  * POST /api/administradores/register
- * Recibe { email, password }
- * hash de contraseña y crea el administrador.
+ * Sin cambios
  */
 exports.registerAdministrator = async (req, res) => {
+
+  console.log('BODY:', req.body);
+
   try {
-    // validación de email y password
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
 
-    // Verificar si ya existe un admin con ese email con el findOne
     const existente = await Administrator.findOne({ where: { email } });
     if (existente) {
-      // 409 es un código que hace referencia a Conflict para indicar que el email ya está registrado
       return res.status(409).json({ error: 'El email ya está registrado' });
     }
 
-    // Hashear la contraseña
+    //Aca hasheamos la contraseña
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Crear el administrador
     const nuevoAdmin = await Administrator.create({ email, passwordHash });
-    //si sale bien retorna un 201
     return res.status(201).json({ id: nuevoAdmin.id, email: nuevoAdmin.email });
   } catch (err) {
     console.error('Error en registerAdministrator:', err);
-    //si sale mal retorna un 500
     return res.status(500).json({ error: err.message || 'Error al registrar administrador' });
   }
 };
 
 /**
  * POST /api/administradores/login
- * Recibe { email, password }. Verifica y crea sesión.
+ * PRINCIPAL CAMBIO: generamos JWT en lugar de sesión
  */
 exports.loginAdministrator = async (req, res, next) => {
+  
+  // TEST
+  console.log('Headers:', req.headers);
+  console.log('Body raw:', req.body);
+  // const { email, password } = req.body;
+
   try {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
-
-    // Buscar admin
+    // Buscamos email
     const admin = await Administrator.findOne({ where: { email } });
     if (!admin) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
-
-    // Comparar hashes
+    // Hacemos match de credenciales con deshasheo de password
     const match = await bcrypt.compare(password, admin.passwordHash);
     if (!match) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    // guardamos el id del administrador en la propiedad adminId de la sesión
-    req.session.adminId = admin.id;
-    // return res.json({ message: 'Login exitoso', email: admin.email });
+    // CAMBIO PRINCIPAL: Generamos JWT en lugar de guardar en sesión
+    const token = jwt.sign(
+      { adminId: admin.id, email: admin.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } // mismo tiempo que teniamos configurado en las cookies (una hora)
+    );
+
+    // Si es API, devolvemos el token para validación
+    if (req.originalUrl.startsWith('/api/')) {
+      return res.json({ 
+        message: 'Login exitoso', 
+        token,
+        email: admin.email 
+      });
+    }
+
+    // Si es web guardamos el token temporalmente y contiunamos
+    req.authToken = token;
     return next();
 
   } catch (err) {
@@ -75,20 +90,17 @@ exports.loginAdministrator = async (req, res, next) => {
 
 /**
  * POST /api/administradores/logout
- * Destruye la sesión del administrador.
+ * Acá hay un cambio respecto al manejo de cookies, ya no tenemos que desturir nada cuando usamos jwt, solo le eliminamos al token del cliente
  */
 exports.logoutAdministrator = async (req, res, next) => {
   try {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('Error al destruir sesión:', err);
-        return res.status(500).json({ error: 'No se pudo cerrar sesión' });
-      }
-      // limpiar cookie en el frontend
-      // res.clearCookie('connect.sid');
-      // return res.json({ message: 'Logout exitoso' });
-      return next()
-    });
+    // Con JWT el logout es simplemente eliminar el token del cliente
+    if (req.originalUrl.startsWith('/api/')) {
+      return res.json({ message: 'Logout exitoso. Elimine el token del cliente.' });
+    }
+    
+    // Para rutas web, simplemente continuamos
+    return next();
   } catch (err) {
     console.error('Error en logoutAdministrator:', err);
     return res.status(500).json({ error: err.message || 'Error al hacer logout' });

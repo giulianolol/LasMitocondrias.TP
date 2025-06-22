@@ -1,79 +1,68 @@
-require('dotenv').config();
-const cors = require('cors'); //habilitamos peticiones desde el frontend con diferente origen (lo que mostró el profe con windsurf)
-const path = require('path')
+require('dotenv').config(); //Cargamos las variables de entorno
+const cors = require('cors'); //habilitamos cors, lo que mostró el profe con windsurf
+const path = require('path');
 const express = require('express');
-const session = require('express-session');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const methodOverride = require('method-override')
+const methodOverride = require('method-override'); //permitimos usar metodos HTTP (PUT, DELETE, etc.) en formularios HTML
 
-// Importar la conexión y modelos
-const db = require('./models'); //conexión
-const authAdmin = require('./middlewares/authAdmin'); //modelos
-const adminController = require('./controllers/administradorController') //modelos
-const productosController = require('./controllers/productosController'); //modelos
-const ventasController = require('./controllers/ventasControllers'); //modelos
-const productosRouter = require('./routes/api/productos'); //modelos
-const ventasRouter = require('./routes/api/ventas'); //modelos
+const db = require('./models'); //intanciamos sequalize
+const authAdmin = require('./middlewares/authAdmin');
+const adminController = require('./controllers/administradorController');
+const productosRouter = require('./routes/api/productos');
+const ventasRouter = require('./routes/api/ventas');
 
-//inciamos express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares básicos SIN MODIFCACIONES
+
+//Middlewares generales
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride('_method')) //Para PUT/PATCH en formularios
-app.use(cors()); // habilitar CORS
+app.use(methodOverride('_method'));
+app.use(cors());
 
-// configuración de las sessiones
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    store: new SequelizeStore({ db: db.sequelize }),
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60, sameSite: true }, // está configurada para que la cookie dure 1 hora y con politica sameSite
-  })
-);
-
-//testear para eliminar
-// app.set('view engine', 'ejs'); 
-// app.set('views', path.join(__dirname, 'views'));
-// app.use(express.static(path.join(__dirname, 'public')));
-
-//Sincronizamos la base y montamos las rutas
 db.sequelize
   .sync({ alter: true })
   .then(() => {
-    console.log('Tablas sincronizadas en la DB.');
+    console.log('Tablas con la DB sinconizadas :)');
 
-    app.use('/api/test', require('./routes/api/test')); // RUTA PARA TESTEAR
+    // app.use('/api/test', require('./routes/api/test')); //Ruta de testeo
 
-    app.get('/admin/login', (req, res) => { res.render('admin/login', { error: null }); });
-    app.post('/admin/login', adminController.loginAdministrator, (req, res) => { res.redirect('/admin/dashboard'); });
-    app.post('/admin/logout', adminController.logoutAdministrator, (req, res) => { res.redirect('/admin/login'); });
+    // Se necesita enviar el token desde el frontend
 
-    app.get('/admin/dashboard', authAdmin, async (req, res) => { const productos = await db.Product.findAll({ order: [['id', 'ASC']] }); res.render('admin/dashboard', { productos }); });
+    // Definimos las RUTAS  y el manejo de errores
 
-    app.get('/admin/productos/new', authAdmin, (req, res) => { res.render('admin/product-form', { producto: null }); });
-    app.post('/admin/productos', authAdmin, productosController.createProducto, (req, res) => { res.redirect('/admin/dashboard'); });
-    app.get('/admin/productos/:id/edit', authAdmin, async (req, res) => { const producto = await db.Product.findByPk(req.params.id); if (!producto) return res.redirect('/admin/dashboard'); res.render('admin/product-form', { producto }); });
-    app.put('/admin/productos/:id', authAdmin, productosController.updateProducto, (req, res) => { res.redirect('/admin/dashboard'); });
-    app.post('/admin/productos/:id/toggle', authAdmin, productosController.toggleProducto, (req, res) => { res.redirect('/admin/dashboard'); });
+    app.use('/api/administradores', require('./routes/api/administradores')); //Montamos el router que maneja todo lo que tiene que ver con administradores
 
-    //estás rutas están protegidas, son de admin
-    app.use('/api/administradores', require('./routes/api/administradores')) //RUTA DE ADMIN
-    app.use('/api/productos', (req, res, next) => { if (req.method === 'GET') return next(); return authAdmin(req, res, next); }, productosRouter);
-    app.use('/api/ventas', (req, res, next) => { if (req.method === 'POST') return next(); return authAdmin(req, res, next); }, ventasRouter);
+    app.use('/api/productos', (req, res, next) => { 
+      if (req.method === 'GET') return next(); 
+      return authAdmin(req, res, next); 
+    }, productosRouter); // GET: cualquier uusario puede listar o ver productos sin token. POST/PUT/DELETE: antes de llegar al router, tienen que pasar por authAdmin
 
-    //Manejo de 404
-    app.use((req, res, next) => { if (req.originalUrl.startsWith('/api/')) { return res.status(404).json({ error: 'Recurso no encontrado' }); } return res.status(404).send('Página no encontrada'); });
+    app.use('/api/ventas', (req, res, next) => { 
+      if (req.method === 'POST') return next(); 
+      return authAdmin(req, res, next); 
+    }, ventasRouter); //POST: Cualquier usuario puede registar una venta (por ejemplo el cliente). GET/PUT/DELTE: Solo determinados roles
 
-    //Error handler
-    app.use((err, req, res, next) => { console.error(err); if (req.originalUrl.startsWith('/api/')) { return res.status(500).json({ error: 'Error interno del servidor' }); } return res.status(500).send('Error interno del servidor'); });
+    app.use((req, res, next) => { 
+      if (req.originalUrl.startsWith('/api/')) { 
+        return res.status(404).json({ error: 'Recurso no encontrado' }); 
+      } 
+      return res.status(404).send('Página no encontrada'); 
+    }); // Si alguna ruta no existe, llega acá
 
-    // Arrancar servidor
-    app.listen(PORT, () => { console.log(`Servidor corriendo en http://localhost:${PORT}/admin/login`); });
+    app.use((err, req, res, next) => { 
+      console.error(err); 
+      if (req.originalUrl.startsWith('/api/')) { 
+        return res.status(500).json({ error: 'Error interno del servidor' }); 
+      } 
+      return res.status(500).send('Error interno del servidor'); 
+    }); //Si hay algun error, llega acá
+
+    //Levantamos el servidor
+    app.listen(PORT, () => { 
+      console.log(`Servidor corriendo en http://localhost:${PORT}/admin/login`); 
+    });
   })
-
-  .catch((err) => { console.error('Error al sincronizar la DB:', err); });
+  .catch((err) => { 
+    console.error('Error al sincronizar la DB:', err); 
+  });

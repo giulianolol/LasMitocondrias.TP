@@ -1,3 +1,5 @@
+const { log } = require("console");
+
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
     inicializarTema();
@@ -12,6 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
     inicializarCarrito();
     actualizarContadorCarrito();
     mostrarProductos();
+    const loginForm = document.getElementById("loginForm");
+    if (loginForm){
+        loginForm.addEventListener("submit", handleAdminLogin)
+    }
     //Solo renderiza el carrito cuando estamos en la página del carrito
     if (document.getElementById('carrito-contenido')) {
         renderizarCarrito();
@@ -22,6 +28,66 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let carrito = [];
+
+//LOGIN
+async function handleAdminLogin(event){
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const email = document.getElementById("emailAdmin").value.trim();
+    const password = document.getElementById("passwordAdmin").value.trim();
+    const errorDiv = document.getElementById("loginError");
+
+    try {
+    const res = await fetch("http://localhost:3000/api/administradores/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!res.ok) {
+      const { error } = await res.json();
+      throw new Error(error || "Credenciales inválidas");
+    }
+
+    const { token } = await res.json();
+
+    //Guardamos el JWT en localStorage
+    localStorage.setItem("adminToken", token);
+
+    //Redirigimos al dashboard
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    console.error("Login error:", err);
+    errorDiv.textContent = err.message;
+    errorDiv.style.display = "block";
+  }
+}
+
+//FUNCION PARA CREAR PRODUCTO
+async function crearProducto(nuevoProducto) {
+  const token = localStorage.getItem("adminToken");
+  if (!token) return window.location.href = "admin.html"; //VA A SALIR POR ACÁ SI NO ESTÁ LOGEADO =)
+
+    const res = await fetch("http://localhost:3000/api/productos", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(nuevoProducto)
+  });
+
+if (!res.ok) throw new Error("No autorizado o fallo al crear producto");
+  return await res.json();
+}
+
+// FUNCIÓN PARA PROBAR SI EL TOKEN EXPIRÓ - hecha para devs o para debugear ;)
+function isTokenExpired(token) {
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  return Date.now() >= payload.exp * 1000;
+}
 
 // CARRITO
 function inicializarCarrito() {
@@ -209,7 +275,6 @@ function procederCompra() {
     }
 }
 
-
 function agregarAlCarrito(producto) {
     const productoExistente = carrito.find(item => item.id === producto.id);
 
@@ -233,7 +298,6 @@ function agregarAlCarrito(producto) {
 function guardarCarrito() {
     localStorage.setItem('carrito', JSON.stringify(carrito));
 }
-
 
 function resaltarNavActivo() {
     const paginaActual = location.pathname.split("/").pop().toLowerCase();
@@ -324,7 +388,6 @@ function configurarBotonesCategorias() {
     // inicializo la vista
     mostrarSeccion("teclados");
 }
-
 
 function manejarFecha() {
     const fecha = document.getElementById("fechaCompleta");
