@@ -18,3 +18,4 @@ router.post('/login', loginAdministrator);
 router.post('/logout', logoutAdministrator);
 
 module.exports = router;
+

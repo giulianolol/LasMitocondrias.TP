@@ -58,6 +58,8 @@ db.sequelize
       return res.status(500).send('Error interno del servidor'); 
     }); //Si hay algun error, llega acá
 
+    
+
     //Levantamos el servidor
     app.listen(PORT, () => { 
       console.log(`Servidor corriendo en http://localhost:${PORT}/admin/login`); 

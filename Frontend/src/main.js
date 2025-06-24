@@ -1,4 +1,4 @@
-const { log } = require("console");
+// const { log } = require("console");
 
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
@@ -30,39 +30,71 @@ document.addEventListener("DOMContentLoaded", () => {
 let carrito = [];
 
 //LOGIN
-async function handleAdminLogin(event){
-
+async function handleAdminLogin(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    const email = document.getElementById("emailAdmin").value.trim();
-    const password = document.getElementById("passwordAdmin").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
     const errorDiv = document.getElementById("loginError");
 
-    try {
-    const res = await fetch("http://localhost:3000/api/administradores/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-
-    if (!res.ok) {
-      const { error } = await res.json();
-      throw new Error(error || "Credenciales inválidas");
+    // Limpiar errores previos
+    if (errorDiv) {
+        errorDiv.style.display = "none";
+        errorDiv.textContent = "";
     }
 
-    const { token } = await res.json();
+    //DESCOMENTAR PARA DEBUGEAR EL FRONTEND - YA FUNCIONA (24/6)
+    // console.log("=== DEBUG FRONTEND ===");
+    // console.log("Email:", email);
+    // console.log("ESTA ES LA PASS: " + password)
+    // console.log("Password:", password ? "***" : "vacío");
+    
 
-    //Guardamos el JWT en localStorage
-    localStorage.setItem("adminToken", token);
+    try {
+        console.log("Enviando request a:", "http://localhost:3000/api/administradores/login");
 
-    //Redirigimos al dashboard
-    window.location.href = "dashboard.html";
-  } catch (err) {
-    console.error("Login error:", err);
-    errorDiv.textContent = err.message;
-    errorDiv.style.display = "block";
-  }
+        const res = await fetch("http://localhost:3000/api/administradores/login", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({ email, password })
+            
+        });
+
+        console.log("Response status:", res.status);
+        console.log("Response ok:", res.ok);
+
+        // Leer la respuesta
+        const responseData = await res.json();
+        console.log("Response data:", responseData);
+
+        if (!res.ok) {
+            throw new Error(responseData.error || "Credenciales inválidas");
+        }
+
+        const { token } = responseData;
+        console.log("Token recibido:", token ? "OK" : "ERROR EN TOKEN");
+
+        // Guardamos el JWT en localStorage
+        localStorage.setItem("adminToken", token);
+
+        // Redirigimos al dashboard
+        window.location.href = "dashboard.html";
+        
+    } catch (err) {
+        console.error("Login error:", err);
+        
+        // Mostrar error solo si existe el elemento
+        if (errorDiv) {
+            errorDiv.textContent = err.message;
+            errorDiv.style.display = "block";
+        } else {
+            // Fallback si no existe el div de error
+            alert("Error: " + err.message);
+        }
+    }
 }
 
 //FUNCION PARA CREAR PRODUCTO

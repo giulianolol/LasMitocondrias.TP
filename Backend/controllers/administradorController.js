@@ -39,52 +39,99 @@ exports.registerAdministrator = async (req, res) => {
  * POST /api/administradores/login
  * PRINCIPAL CAMBIO: generamos JWT en lugar de sesión
  */
-exports.loginAdministrator = async (req, res, next) => {
-  
-  // TEST
-  console.log('Headers:', req.headers);
-  console.log('Body raw:', req.body);
-  // const { email, password } = req.body;
 
+exports.loginAdministrator = async (req, res, next) => {
   try {
+    console.log('🚀 POST /login ejecutado')
+    console.log('=== DEBUG LOGIN ===');
+    console.log('Headers:', req.headers);
+    console.log('Body raw:', req.body);
+    
     const { email, password } = req.body;
+    console.log('Email extraído:', email);
+    console.log('Password extraído:', password);
+    
+    // Validación de datos requeridos
     if (!email || !password) {
+      console.log('Faltan datos obligatorios');
       return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
-    // Buscamos email
-    const admin = await Administrator.findOne({ where: { email } });
+
+    // Buscar administrador por email
+    console.log('🔍 Buscando admin con email:', email);
+    const admin = await Administrator.findOne({ 
+      where: { email: email.toLowerCase().trim() } 
+    });
+    
+    console.log('Admin encontrado:', admin ? `ID: ${admin.id}, Email: ${admin.email}` : 'null');
+    
     if (!admin) {
-      return res.status(401).json({ error: 'Credenciales inválidas' });
-    }
-    // Hacemos match de credenciales con deshasheo de password
-    const match = await bcrypt.compare(password, admin.passwordHash);
-    if (!match) {
+      console.log('Admin no encontrado');
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    // CAMBIO PRINCIPAL: Generamos JWT en lugar de guardar en sesión
+    // Verificar contraseña
+    console.log('Verificando contraseña...');
+    console.log('Password recibido:', password);
+    console.log('Hash almacenado:', admin.passwordHash);
+
+    // DEBUGGIN TEMPORAL (TESTEAMOS EL LOGIN EN EL BACKEND, daba error de credenciales)
+    // console.log('Versión de bcrypt:', require('bcrypt/package.json').version);
+    // console.log('Longitud del hash:', admin.passwordHash.length);
+
+    // // Probar manualmente el hash que sabemos que funciona
+    // const testHash = '$2b$10$N9qo8uLOickgx2ZMyubHOOGaQCOMNDTAOsxOOLNsW1e2cXAiuLuW6';
+    // const testMatch = await bcrypt.compare('password123', testHash);
+    // console.log('Test con hash conocido:', testMatch);
+
+    // // Generar un hash nuevo para comparar
+    // const newHash = await bcrypt.hash('password123', 10);
+    // console.log('Hash nuevo generado:', newHash);
+    // const newMatch = await bcrypt.compare('password123', newHash);
+    // console.log('Match con hash nuevo:', newMatch);
+
+    // const match2 = await bcrypt.compare(password, admin.passwordHash);
+    // console.log('Password match original:', match2);
+    
+    // Verificar contraseña
+    console.log('Verificando contraseña...');
+    console.log('Password recibido:', password); // Agrega esta línea
+    console.log('Hash almacenado:', admin.passwordHash); // Opcional: también ver el hash
+    const match = await bcrypt.compare(password, admin.passwordHash);
+    console.log('Password match:', match);
+    
+    if (!match) {
+      console.log('Contraseña incorrecta');
+      return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+
+    // Generar JWT
+    console.log('Generando token...');
     const token = jwt.sign(
-      { adminId: admin.id, email: admin.email },
+      { 
+        adminId: admin.id, 
+        email: admin.email,
+        role: 'admin'
+      },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' } // mismo tiempo que teniamos configurado en las cookies (una hora)
+      { expiresIn: '1h' }
     );
 
-    // Si es API, devolvemos el token para validación
-    if (req.originalUrl.startsWith('/api/')) {
-      return res.json({ 
-        message: 'Login exitoso', 
-        token,
-        email: admin.email 
-      });
-    }
+    console.log('Login exitoso para:', admin.email);
+    
+    // Respuesta exitosa
+    return res.status(200).json({ 
+      message: 'Login exitoso', 
+      token,
+      email: admin.email,
+      adminId: admin.id
+    });
 
-    // Si es web guardamos el token temporalmente y contiunamos
-    req.authToken = token;
-    return next();
-
-  } catch (err) {
-    console.error('Error en loginAdministrator:', err);
-    return res.status(500).json({ error: err.message || 'Error al hacer login' });
+  } catch (error) {
+    console.error('💥 Error en loginAdministrator:', error);
+    return res.status(500).json({ 
+      error: 'Error interno del servidor' 
+    });
   }
 };
 
