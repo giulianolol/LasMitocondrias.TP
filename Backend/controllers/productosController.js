@@ -1,3 +1,4 @@
+const { Console } = require('console');
 const path = require('path');
 const db = require(path.join(__dirname, '..', 'models', 'index.js'));
 // const db = require('../models');
@@ -82,5 +83,31 @@ exports.toggleProducto = async (req, res) => {
   } catch (err) {
     console.error('Error en toggleActive:', err);
     return res.status(500).json({ error: 'Error al cambiar estado' });
+  }
+};
+
+exports.eliminarProducto = async (req, res) => {
+  //Obtener el ID de la URL
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    //Buscar en la base de datos
+    const product = await Product.findByPk(id);
+    if (!product) {
+      // No existe → 404
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    // Sí existe → eliminar
+    await product.destroy();
+
+    // Responder éxito
+    return res.json({ msg: 'Producto eliminado correctamente' });
+  } catch (err) {
+    console.error('Error al eliminar producto:', err);
+    return res.status(500).json({ error: 'Error interno del servidor' });
   }
 };

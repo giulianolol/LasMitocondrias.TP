@@ -57,25 +57,26 @@ exports.loginAdministrator = async (req, res, next) => {
       return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
 
+    // DEBUGGIN TEMPORAL (TESTEAMOS EL LOGIN EN EL BACKEND, daba error de credenciales)
+
     // Buscar administrador por email
-    console.log('🔍 Buscando admin con email:', email);
+    console.log(' Buscando admin con email:', email);
     const admin = await Administrator.findOne({ 
       where: { email: email.toLowerCase().trim() } 
     });
     
-    console.log('Admin encontrado:', admin ? `ID: ${admin.id}, Email: ${admin.email}` : 'null');
+    // console.log('Admin encontrado:', admin ? `ID: ${admin.id}, Email: ${admin.email}` : 'null');
     
-    if (!admin) {
-      console.log('Admin no encontrado');
-      return res.status(401).json({ error: 'Credenciales inválidas' });
-    }
+    // if (!admin) {
+    //   console.log('Admin no encontrado');
+    //   return res.status(401).json({ error: 'Credenciales inválidas' });
+    // }
 
     // Verificar contraseña
-    console.log('Verificando contraseña...');
-    console.log('Password recibido:', password);
-    console.log('Hash almacenado:', admin.passwordHash);
+    // console.log('Verificando contraseña...');
+    // console.log('Password recibido:', password);
+    // console.log('Hash almacenado:', admin.passwordHash);
 
-    // DEBUGGIN TEMPORAL (TESTEAMOS EL LOGIN EN EL BACKEND, daba error de credenciales)
     // console.log('Versión de bcrypt:', require('bcrypt/package.json').version);
     // console.log('Longitud del hash:', admin.passwordHash.length);
 
