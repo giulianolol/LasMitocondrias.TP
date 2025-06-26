@@ -22,6 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById('carrito-contenido')) {
         renderizarCarrito();
     }
+    if (document.getElementById('ticket-body')) {
+    renderTicketPage();
+    }
+    
     document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
     document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
 
@@ -252,6 +256,7 @@ function vaciarCarritoConfirmado() {
 }
 
 function procederCompra() {
+
     if (carrito.length === 0) {
         mostrarAlerta('Tu carrito está vacío', 'warning');
         return;
@@ -279,8 +284,7 @@ function procederCompra() {
     }, 2000);
 }
 
-function actualizarContadorCarrito() {
-    // Actualizar contador en navbar si existe
+function actualizarContadorCarrito() {// Actualizar contador en navbar si existe
     const contadorNav = document.getElementById('contador-carrito');
     if (contadorNav) {
         const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
@@ -296,19 +300,19 @@ function actualizarContadorCarrito() {
     }
 }
 
-function procederCompra() {
-    // Pregunto al usuario si está seguro
-    // const confirmado = window.confirm("¿Estás seguro de que quieres finalizar la compra?");
-    const confirmado = true; // Para pruebas, siempre confirmo
-    if (confirmado) {
-        //redirijo
-        window.location.href = "http://127.0.0.1:5500/Frontend/pages/ticket.html";
-    }
-    else {
-        //  aviso opcional
-        mostrarAlerta("No se completó la compra", "info");
-    }
-}
+// function procederCompra() {
+//     // Pregunto al usuario si está seguro
+//     // const confirmado = window.confirm("¿Estás seguro de que quieres finalizar la compra?");
+//     const confirmado = true; // Para pruebas, siempre confirmo
+//     if (confirmado) {
+//         //redirijo
+//         window.location.href = "http://127.0.0.1:5500/Frontend/pages/ticket.html";
+//     }
+//     else {
+//         //  aviso opcional
+//         mostrarAlerta("No se completó la compra", "info");
+//     }
+// }
 
 function agregarAlCarrito(producto) {
     const productoExistente = carrito.find(item => item.id === producto.id);
@@ -951,4 +955,47 @@ async function eliminarProducto(id) {
     console.error('Error al eliminar producto:', error);
     alert('ALERT Ocurrió un error inesperado al eliminar el producto.');
   }
+}
+
+//TICKET
+
+function renderTicketPage() {
+    const compraJSON = localStorage.getItem('ultimaCompra');
+    if (!compraJSON) return;  // no hay nada que mostrar
+
+    const { productos, total, fecha, cliente } = JSON.parse(compraJSON);
+
+    // Poner nombre y fecha
+    document.getElementById('nameTicket').textContent = cliente;
+    document.getElementById('fechaCompleta').textContent = fecha;
+
+    const tbody = document.getElementById('ticket-body');
+    tbody.innerHTML = '';  // por si acaso
+
+    productos.forEach(item => {
+        const precio = parseFloat(item.price);
+        const cantidad = item.cantidad || 1;
+        const subtotal = precio * cantidad;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.type}</td>
+            <td>$${precio.toFixed(2)}</td>
+            <td>${cantidad}</td>
+            <td>$${subtotal.toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Mostrar total al pie de tabla
+    document.getElementById('ticket-total').textContent = `$${parseFloat(total).toFixed(2)}`;
+}
+
+function calcularTotalCarrito() {
+  return carrito.reduce((acumulado, item) => {
+    const precio = parseFloat(item.price);
+    const cantidad = item.cantidad || 1;
+    return acumulado + precio * cantidad;
+  }, 0);
 }
