@@ -182,11 +182,11 @@ function renderizarCarrito() {
                         </div>
                         <div class="col-md-2">
                             <div class="input-group input-group-sm">
-                                <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad(${item.id}, -1)">
+                                <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad('${item.name}', -1)">
                                     <i class="fas fa-minus"></i>
                                 </button>
                                 <input type="text" class="form-control text-center" value="${item.cantidad}" readonly>
-                                <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad(${item.id}, 1)">
+                                <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad('${item.name}', 1)">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
@@ -194,7 +194,7 @@ function renderizarCarrito() {
                         <div class="col-md-2 text-center">
                             <div class="d-flex flex-column align-items-center">
                                 <span class="fw-bold mb-2">$${(item.price * item.cantidad).toFixed(2)}</span>
-                                <button class="btn btn-outline-danger btn-sm" onclick="eliminarDelCarrito(${item.id})" title="Eliminar producto">
+                                <button class="btn btn-outline-danger btn-sm" onclick="eliminarDelCarrito('${item.name}')" title="Eliminar producto">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -206,14 +206,16 @@ function renderizarCarrito() {
     `;
 }
 
-function cambiarCantidad(productoId, cambio) {
-    const producto = carrito.find(item => item.id === productoId);
+function cambiarCantidad(productoNombre, cambio) {
+
+
+    const producto = carrito.find(item => item.name === productoNombre);
     if (!producto) return;
 
     const nuevaCantidad = producto.cantidad + cambio;
 
     if (nuevaCantidad <= 0) {
-        eliminarDelCarrito(productoId);
+        eliminarDelCarrito(productoNombre);
     } else {
         producto.cantidad = nuevaCantidad;
         guardarCarrito();
@@ -228,8 +230,9 @@ function cambiarCantidad(productoId, cambio) {
     }
 }
 
-function eliminarDelCarrito(productoId) {
-    const index = carrito.findIndex(item => item.id === productoId);
+function eliminarDelCarrito(productoName) {
+
+    const index = carrito.findIndex(item => item.name === productoName);
     if (index > -1) {
         const nombreProducto = carrito[index].name;
         carrito.splice(index, 1);
@@ -862,7 +865,7 @@ async function mostrarProductos() {
     console.log('Cargando productos...');
 
     const tbody = document.getElementById('tabla-productos');
-    const spinner = document.getElementById('spinner'); // opcional: si tenés un spinner global
+    const spinner = document.getElementById('spinner');
 
     if (!tbody) return;
 
@@ -902,22 +905,50 @@ async function mostrarProductos() {
 }
 
 async function eliminarProducto(id) {
-    const confirmado = confirm(`¿Estás seguro de eliminar el producto con ID ${id}?`);
+  // Confirmación en el cliente
+  const confirmado = confirm(`¿Estás seguro de eliminar el producto con ID ${id}?`);
+  if (!confirmado) return;
 
-    if (!confirmado) return;
-
-    try {
-        const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (!res.ok) throw new Error('No se pudo eliminar el producto');
-
-        alert('Producto eliminado correctamente');
-        mostrarProductos(); // Volver a cargar la tabla
-
-    } catch (error) {
-        console.error('Error al eliminar producto:', error);
-        alert('Error al eliminar el producto');
+  try {
+    //Obtener el token de admin
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      alert('ERROR No tienes un token de administrador. Por favor, inicia sesión de nuevo.');
+      return;
     }
+
+    //Llamada a la API
+    const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+      
+    });
+
+    //Manejo de respuestas HTTP
+    if (res.status === 401) {
+      alert('ERROR No autorizado. Inicia sesión como administrador.');
+      return;
+    }
+    if (res.status === 404) {
+      alert(`ERROR Producto con ID ${id} no encontrado.`);
+      return;
+    }
+    if (!res.ok) {
+      // otros errores de servidor
+      const errorText = await res.text();
+      alert(`Error al eliminar (status ${res.status}): ${errorText}`);
+      return;
+    }
+
+    //Éxito
+    alert('OK Producto eliminado correctamente');
+    mostrarProductos(); // recargamos tu tabla o galería
+
+  } catch (error) {
+    console.error('Error al eliminar producto:', error);
+    alert('ALERT Ocurrió un error inesperado al eliminar el producto.');
+  }
 }
