@@ -25,18 +25,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById('ticket-body')) {
     renderTicketPage();
     }
+
     
-    document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
-    document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
-
-});
-
-let carrito = [];
-
-//LOGIN
-async function handleAdminLogin(event) {
-    event.preventDefault();
-    event.stopPropagation();
+    //Si estamos en modificaciones.html leemos el producto y podemos llenar el formulad
+    if (location.pathname.endsWith('modificaciones.html')) {
+        cargarProductoParaModificar();
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const productoJSON = localStorage.getItem('productoParaModificar');
+        if (!productoJSON) return console.warn('No hay producto para modificar en localStorage');
+        
+        const producto = JSON.parse(productoJSON);
+        if (String(producto.id) !== id) {
+            console.warn('El ID de la URL y el de localStorage no coinciden');
+            return;
+        }}
+        
+        document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
+        document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
+    });
+    
+    let carrito = [];
+    
+    //LOGIN
+    async function handleAdminLogin(event) {
+        event.preventDefault();
+        event.stopPropagation();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -892,7 +906,7 @@ async function mostrarProductos() {
                 <td>$${producto.price}</td>
                 <td>${producto.active ? 'Sí' : 'No'}</td>
                 <td>
-                    <a href="modificaciones.html?id=${producto.id}" class="btn btn-sm btn-warning">Modificar</a>
+                    <a class="btn btn-sm btn-warning" onclick="modificarProducto(${producto.id})">Modificar</a>
                     <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id})">Eliminar</button>
                 </td>
             `;
@@ -998,4 +1012,87 @@ function calcularTotalCarrito() {
     const cantidad = item.cantidad || 1;
     return acumulado + precio * cantidad;
   }, 0);
+}
+
+//MODIFICACIÖN
+async function modificarProducto(id) {
+
+  try {
+    const token = localStorage.getItem('adminToken');
+    const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error('Error al obtener el producto');
+    const producto = await res.json();
+    localStorage.setItem('productoParaModificar', JSON.stringify(producto));
+    // Llevamos el id en la query string (creo que no es necesario igualmente)
+    window.location.href = `modificaciones.html?id=${id}`;
+  } catch (err) {
+    console.error(err);
+    alert('No se pudo preparar la modificación del producto.');
+  }
+
+}
+
+function cargarProductoParaModificar() {const productoJSON = localStorage.getItem('productoParaModificar');
+  if (!productoJSON) {
+    console.warn('No hay producto para modificar en localStorage');
+    return;
+  }
+  const p = JSON.parse(productoJSON);
+  
+  console.log(p)
+
+  // Campo oculto para el ID
+  let inputId = document.getElementById('productoId');
+  if (!inputId) {
+    inputId = document.createElement('input');
+    inputId.type = 'hidden';
+    inputId.id   = 'productoId';
+    document.querySelector('form').prepend(inputId);
+  }
+  inputId.value = p.id;
+
+  // Nombre
+  const nombre = document.getElementById('nombre');
+  if (nombre) nombre.value = p.name || '';
+
+  // Descripción
+  const descripcion = document.getElementById('descripcion');
+  if (descripcion) descripcion.value = p.description || '';
+
+  // Precio
+  const precio = document.getElementById('precio');
+  if (precio) precio.value = p.price || '';
+
+  // Stock
+  const stock = document.getElementById('stock');
+  if (stock) stock.value = p.stock || '';
+
+  // Activo
+  const activo = document.getElementById('activo');
+  if (activo) activo.value = String(p.active);
+
+  // Tipo
+  const tipo = document.getElementById('type');
+  if (tipo) tipo.value = p.type || '';
+
+  // Preview de imagen
+  const fileInput = document.getElementById('imagen');
+  if (fileInput) {
+    const preview = document.createElement('img');
+    preview.src = p.imageUrl;
+    preview.alt = 'Imagen actual';
+    preview.style.maxWidth = '200px';
+    preview.style.display = 'block';
+    preview.style.marginTop = '0.5rem';
+    fileInput.parentNode.append(preview);
+  }
+
+  // Metadatos de creación y actualización
+  const contenedor = document.querySelector('main.container') || document.body;
+  const meta = document.createElement('p'); //creamos un parrafo "dinamico"
+  meta.innerText = `Creado: ${new Date(p.createdAt).toLocaleString()} | Actualizado: ${new Date(p.updatedAt).toLocaleString()}`; //le asignamos el texto con las fechas
+  contenedor.prepend(meta); // añadimos el parrafo antes de cualquier otro hijo, así el "meta" queda arriba/primero
 }

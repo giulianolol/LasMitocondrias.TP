@@ -64,6 +64,8 @@ exports.loginAdministrator = async (req, res, next) => {
     const admin = await Administrator.findOne({ 
       where: { email: email.toLowerCase().trim() } 
     });
+
+    //TODO ESTO ES TESTING, ELIMINAR ANTES DE PASAR A RAMA PRODUCTIVA
     
     // console.log('Admin encontrado:', admin ? `ID: ${admin.id}, Email: ${admin.email}` : 'null');
     
@@ -80,7 +82,8 @@ exports.loginAdministrator = async (req, res, next) => {
     // console.log('Versión de bcrypt:', require('bcrypt/package.json').version);
     // console.log('Longitud del hash:', admin.passwordHash.length);
 
-    // // Probar manualmente el hash que sabemos que funciona
+    // // Probar manualmente el hash que sabemos que funciona - Tenía error en hash, por eso devolvía credenciales invalidas 
+    // NOTA: ATENCIÓN CON EL HASH Y CREAR USUARIOS MANUALMENTE DESDE SUPABASE
     // const testHash = '$2b$10$N9qo8uLOickgx2ZMyubHOOGaQCOMNDTAOsxOOLNsW1e2cXAiuLuW6';
     // const testMatch = await bcrypt.compare('password123', testHash);
     // console.log('Test con hash conocido:', testMatch);

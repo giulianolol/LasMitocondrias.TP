@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getProductosActivos,
+  getProductoById,
   createProducto,
   updateProducto,
   toggleProducto,
@@ -12,18 +13,22 @@ const {
 //    GET /api/productos
 router.get('/', getProductosActivos);
 
-// 2) Crear producto (ADMINS si lo protegés luego con middleware)
+// 2) Obtener producto por id
+router.get('/:id', getProductoById)
+
+// 3) Crear producto (ADMINS si lo protegés luego con middleware)
 //    POST /api/productos
 router.post('/', createProducto);
 
-// 3) Actualizar producto
+// 4) Actualizar producto
 //    PUT /api/productos/:id
 router.put('/:id', updateProducto);
 
-// 4) Activar / Desactivar (toggle)
+// 5) Activar / Desactivar (toggle)
 //    PATCH /api/productos/:id/toggle
 router.patch('/:id/toggle', toggleProducto);
 
+// 6) Eliminar producto - NOTA: Revisar la lógica del toggleProducto, punto 5, justo arriba :)
 router.delete('/:id', eliminarProducto);
 
 module.exports = router;

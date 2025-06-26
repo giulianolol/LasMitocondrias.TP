@@ -111,3 +111,16 @@ exports.eliminarProducto = async (req, res) => {
     return res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
+
+exports.getProductoById = async (req, res) => {
+  try {
+    const producto = await Product.findByPk(req.params.id);
+    if (!producto) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+    res.json(producto);
+  } catch (error) {
+    console.error('Error en getProductoById:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
