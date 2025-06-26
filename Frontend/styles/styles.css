@@ -1,0 +1,100 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header {
+    color: white;
+    padding: 10px;
+}
+
+.navbar .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+#logo-text {
+    gap: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+#saludoNavbar {
+    color: rgb(255, 0, 0);
+    font-size: 15px;
+}
+
+.navbar-center {
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.autores {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.navbar-nav {
+    gap: 20px;
+}
+
+.navbar .navbar-nav .nav-item .nav-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.navbar .navbar-nav .nav-item .nav-link:hover {
+    text-decoration: none;
+    color: #9c9c9c;
+    cursor: pointer;
+}
+
+.nav-link.active-border {
+    border-bottom: 3px solid white;
+    padding-bottom: 2px;
+}
+
+.card.bg-dark {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card.bg-dark:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+}
+
+.card-img-top {
+    object-fit: cover;
+    height: 200px;
+}
+
+.btn-outline-light {
+    border-radius: 0.5rem;
+}
+
+h2 {
+    color: #ffffff;
+}
+
+.bg-completly-black {
+    background-color: #000000 !important;
+    color: white !important;
+}
+
+.borde-inferior {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.borde-superior {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
