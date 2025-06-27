@@ -10,6 +10,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('mouse', 'teclado'),
       allowNull: false,
     },
+    stock:{
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    description:{
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,

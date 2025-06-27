@@ -44,26 +44,33 @@ exports.createProducto = async (req, res) => {
  */
 exports.updateProducto = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { name, type, price, imageUrl, active } = req.body;
+    // Desestructura TODO lo que viene en el body
+    const { name, description, price, stock, type, active } = req.body;
 
-    const producto = await Product.findByPk(id);
-    if (!producto) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
+    // Construye un objeto solo con los campos que no sean undefined
+    const updates = {};
+    if (name        !== undefined) updates.name        = name;
+    if (description !== undefined) updates.description = description;
+    if (price       !== undefined) updates.price       = price;
+    if (stock       !== undefined) updates.stock       = stock;
+    if (type        !== undefined) updates.type        = type;
+    if (active      !== undefined) updates.active      = active;
+
+    const [rowsUpdated] = await Product.update(
+      updates,
+      { where: { id: req.params.id }, returning: true }
+    );
+
+    if (rowsUpdated === 0) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
     }
 
-    // Actualizar solo las propiedades que vengan en el body
-if (name) {producto.name = name;}
-if (type) {producto.type = type;}
-if (price) {producto.price = price;}
-if (imageUrl) {producto.imageUrl = imageUrl;}
-if (active !== undefined) {producto.active = active;}
-
-    await producto.save();
-    return res.status(200).json(producto);
-  } catch (err) {
-    console.error('Error en updateProducto:', err);
-    return res.status(500).json({ error: 'Error al actualizar producto' });
+    // Devolver el producto actualizado si querés
+    const productoActualizado = await Product.findByPk(req.params.id);
+    res.json(productoActualizado);
+  } catch (error) {
+    console.error('Error en updateProducto:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
 
