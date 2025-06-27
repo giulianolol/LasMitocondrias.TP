@@ -30,6 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
     //Si estamos en modificaciones.html leemos el producto y podemos llenar el formulad
     if (location.pathname.endsWith('modificaciones.html')) {
         cargarProductoParaModificar();
+
+        const form = document.getElementById('formModificar');
+        if (form) {
+        form.addEventListener('submit', guardarCambiosProducto);
+        }
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         const productoJSON = localStorage.getItem('productoParaModificar');
@@ -40,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.warn('El ID de la URL y el de localStorage no coinciden');
             return;
         }}
-        
+
         document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
         document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
     });
@@ -1095,4 +1100,51 @@ function cargarProductoParaModificar() {const productoJSON = localStorage.getIte
   const meta = document.createElement('p'); //creamos un parrafo "dinamico"
   meta.innerText = `Creado: ${new Date(p.createdAt).toLocaleString()} | Actualizado: ${new Date(p.updatedAt).toLocaleString()}`; //le asignamos el texto con las fechas
   contenedor.prepend(meta); // añadimos el parrafo antes de cualquier otro hijo, así el "meta" queda arriba/primero
+}
+
+async function guardarCambiosProducto(e) {
+  e.preventDefault(); // evita que recargue la página
+
+  const id = document.getElementById('productoId').value;
+  const name = document.getElementById('nombre').value;
+  const description = document.getElementById('descripcion').value;
+  const price = document.getElementById('precio').value;
+  const stock = document.getElementById('stock').value;
+  const active = document.getElementById('activo').value === 'true';
+  const token = localStorage.getItem('adminToken');
+
+  const payload = {
+    name,
+    description,
+    price,
+    stock,
+    active
+  };
+
+  console.log(payload)
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Error al actualizar el producto');
+    }
+
+    alert('Producto actualizado con éxito');
+
+    // Limpiamos y redirigimos
+    localStorage.removeItem('productoParaModificar');
+    window.location.href = 'dashboard.html';
+  } catch (err) {
+    console.error(err);
+    alert('Error al guardar cambios: ' + err.message);
+  }
 }
