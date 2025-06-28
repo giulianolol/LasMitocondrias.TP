@@ -2,18 +2,18 @@
 
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
-    inicializarTema();
     resaltarNavActivo();
     manejarBienvenida();
     manejarFecha();
     verificarNombre();
-    mostrarTeclados();
     mostrarMouses();
+    mostrarTeclados();
     mostrarTecladosPaginacion();
     configurarBotonesCategorias();
     inicializarCarrito();
     actualizarContadorCarrito();
     mostrarProductos();
+    inicializarTema();
     const loginForm = document.getElementById("loginForm");
     if (loginForm){
         loginForm.addEventListener("submit", handleAdminLogin)
@@ -499,7 +499,7 @@ function inicializarTema() {
 
         if (card) {
             card.classList.remove('bg-light');
-            card.classList.add('bg-dark', 'text-white');
+            // card.classList.add('bg-dark', 'text-white');
         }
 
         if (navbar) {
@@ -519,10 +519,6 @@ function inicializarTema() {
         body.classList.remove('bg-dark', 'text-white');
         body.classList.add('bg-body-secondary');
 
-        if (card) {
-            card.classList.remove('bg-dark', 'text-white');
-            card.classList.add('bg-light');
-        }
 
         if (navbar) {
             navbar.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
@@ -606,6 +602,8 @@ async function mostrarTeclados() {
                         <p class="card-text text-white">Tipo: ${teclado.type}</p>
                         <p class="card-text text-white">Precio: $${teclado.price}</p>
                         <p class="card-text text-success">Estado: ${teclado.active}</p>
+                        <p class="card-text ">Stock: ${teclado.stock}</p>
+                        <p class="card-text ">Descripción: ${acortarDescripcion(teclado.description, 100)}</p>
                     </div>
                 </div>
             `;
@@ -656,6 +654,8 @@ async function mostrarMouses() {
                         <p class="card-text">Tipo: ${mouse.type}</p>
                         <p class="card-text">Precio: $${mouse.price}</p>
                         <p class="card-text text-success">Estado: ${mouse.active}</p>
+                        <p class="card-text">Stock: ${mouse.stock}</p>
+                        <p class="card-text ">Descripción: ${acortarDescripcion(mouse.description, 100)}</p>
                         <div class="mt-auto">
                             <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(mouse).replace(/"/g, '&quot;')})">
                                 <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
@@ -715,13 +715,15 @@ function renderizarPaginaTeclados() {
         const col = document.createElement('div');
         col.className = 'col-md-4 mb-4';
         col.innerHTML = `
-            <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
+            <div  class="card bg-dark text-white h-100 shadow-sm rounded-4 teclados">
                 <img src="${teclado.imageUrl}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${teclado.name}" />
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${teclado.name}</h5>
                     <p class="card-text">Tipo: ${teclado.type}</p>
                     <p class="card-text">Precio: $${teclado.price}</p>
                     <p class="card-text text-success">Estado: ${teclado.active}</p>
+                    <p class="card-text ">Stock: ${teclado.stock}</p>
+                    <p class="card-text ">Descripción: ${acortarDescripcion(teclado.description, 100)}</p>
                     <div class="mt-auto">
                         <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(teclado).replace(/"/g, '&quot;')})">
                             <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
@@ -835,6 +837,8 @@ function renderizarPaginaMouses() {
                     <p class="card-text">Tipo: ${mouse.type}</p>
                     <p class="card-text">Precio: $${mouse.price}</p>
                     <p class="card-text text-success">Estado: ${mouse.active}</p>
+                    <p class="card-text">Stock: ${mouse.stock}</p>
+                    <p class="card-text">Descripción: ${acortarDescripcion(mouse.description, 100)}</p>
                     <div class="mt-auto">
                         <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(mouse).replace(/"/g, '&quot;')})">
                             <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
@@ -1147,4 +1151,21 @@ async function guardarCambiosProducto(e) {
     console.error(err);
     alert('Error al guardar cambios: ' + err.message);
   }
+}
+
+function acortarDescripcion(texto, maxCaracteres) {
+  if (texto.length <= maxCaracteres) {
+    return texto;
+  }
+
+  const textoRecortado = texto.slice(0, maxCaracteres);
+
+  // Cortar en el último espacio para no partir palabras
+  const ultimoEspacio = textoRecortado.lastIndexOf(" ");
+
+  if (ultimoEspacio === -1) {
+    return textoRecortado + "...";
+  }
+
+  return textoRecortado.slice(0, ultimoEspacio) + "...";
 }
