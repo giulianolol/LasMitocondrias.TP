@@ -59,13 +59,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
-    const errorDiv = document.getElementById("loginError");
+    // const errorDiv = document.getElementById("loginError");
 
     // Limpiar errores previos
-    if (errorDiv) {
-        errorDiv.style.display = "none";
-        errorDiv.textContent = "";
-    }
+    // if (errorDiv) {
+    //     errorDiv.style.display = "none";
+    //     errorDiv.textContent = "";
+    // }
 
     //DESCOMENTAR PARA DEBUGEAR EL FRONTEND - YA FUNCIONA (24/6)
     // console.log("=== DEBUG FRONTEND ===");
@@ -93,7 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const responseData = await res.json();
         console.log("Response data:", responseData);
 
-        if (!res.ok) {
+        if (!res.status.toString().startsWith("2")) {
+            mostrarAlerta("Credenciales inválidas", "danger");  
             throw new Error(responseData.error || "Credenciales inválidas");
         }
 
@@ -104,19 +105,22 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("adminToken", token);
 
         // Redirigimos al dashboard
-        window.location.href = "dashboard.html";
-        
+        mostrarAlerta("Login exitoso. Redirigiendo al dashboard...", "success");
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 2000);
+
     } catch (err) {
         console.error("Login error:", err);
         
         // Mostrar error solo si existe el elemento
-        if (errorDiv) {
-            errorDiv.textContent = err.message;
-            errorDiv.style.display = "block";
-        } else {
-            // Fallback si no existe el div de error
-            alert("Error: " + err.message);
-        }
+        // if (errorDiv) {
+        //     errorDiv.textContent = err.message;
+        //     errorDiv.style.display = "block";
+        // } else {
+        //     // Fallback si no existe el div de error
+        //     alert("Error: " + err.message);
+        // }
     }
 }
 
@@ -602,7 +606,7 @@ async function mostrarTeclados() {
                         <p class="card-text text-white">Tipo: ${teclado.type}</p>
                         <p class="card-text text-white">Precio: $${teclado.price}</p>
                         <p class="card-text text-success">Estado: ${teclado.active}</p>
-                        <p class="card-text ">Stock: ${teclado.stock}</p>
+                        <p class="card-text ">Stock: ${teclado.stock == null ? "Sin stock" : teclado.stock}</p>
                         <p class="card-text ">Descripción: ${acortarDescripcion(teclado.description, 100)}</p>
                     </div>
                 </div>
@@ -612,6 +616,7 @@ async function mostrarTeclados() {
         });
 
     } catch (err) {
+        console.log('Error al cargar teclados:', err);
         mostrarAlerta('Error al cargar teclados', 'danger');
     } finally {
         spinner.style.display = 'none';
@@ -722,7 +727,7 @@ function renderizarPaginaTeclados() {
                     <p class="card-text">Tipo: ${teclado.type}</p>
                     <p class="card-text">Precio: $${teclado.price}</p>
                     <p class="card-text text-success">Estado: ${teclado.active}</p>
-                    <p class="card-text ">Stock: ${teclado.stock}</p>
+                    <p class="card-text ">Stock: ${teclado.stock == null ? "Sin stock" : teclado.stock}</p>
                     <p class="card-text ">Descripción: ${acortarDescripcion(teclado.description, 100)}</p>
                     <div class="mt-auto">
                         <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(teclado).replace(/"/g, '&quot;')})">
@@ -837,7 +842,7 @@ function renderizarPaginaMouses() {
                     <p class="card-text">Tipo: ${mouse.type}</p>
                     <p class="card-text">Precio: $${mouse.price}</p>
                     <p class="card-text text-success">Estado: ${mouse.active}</p>
-                    <p class="card-text">Stock: ${mouse.stock}</p>
+                    <p class="card-text">Stock: ${mouse.stock == null ? "Sin stock" : mouse.stock}</p>
                     <p class="card-text">Descripción: ${acortarDescripcion(mouse.description, 100)}</p>
                     <div class="mt-auto">
                         <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(mouse).replace(/"/g, '&quot;')})">
@@ -1154,6 +1159,10 @@ async function guardarCambiosProducto(e) {
 }
 
 function acortarDescripcion(texto, maxCaracteres) {
+
+if (texto === null || texto === undefined) {
+    return "Sin descripción disponible";  
+}
   if (texto.length <= maxCaracteres) {
     return texto;
   }
