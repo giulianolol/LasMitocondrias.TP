@@ -1,5 +1,7 @@
 // const { log } = require("console");
 
+// const { log } = require("console");
+
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
     resaltarNavActivo();
@@ -1083,10 +1085,10 @@ async function modificarProducto(id) {
 
   try {
     const token = localStorage.getItem('adminToken');
+    console.log('Token de administrador:', token);
     const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-
     if (!res.ok) throw new Error('Error al obtener el producto');
     const producto = await res.json();
     localStorage.setItem('productoParaModificar', JSON.stringify(producto));

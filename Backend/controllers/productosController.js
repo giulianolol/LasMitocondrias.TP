@@ -44,6 +44,7 @@ exports.createProducto = async (req, res) => {
  * Body: { name, type, price, imageUrl, active (opcional) }
  */
 exports.updateProducto = async (req, res) => {
+  console.log('Actualizando producto con ID:');
   try {
     // Desestructura TODO lo que viene en el body
     const { name, description, price, stock, type, active } = req.body;
