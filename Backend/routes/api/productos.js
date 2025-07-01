@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getProductosActivos,
+  getProductos,
   getProductoById,
   createProducto,
   updateProducto,
@@ -9,9 +9,9 @@ const {
   eliminarProducto
 } = require('../../controllers/productosController');
 
-// 1) Listar productos activos
+// 1) Listar productos 
 //    GET /api/productos
-router.get('/', getProductosActivos);
+router.get('/', getProductos);
 
 // 2) Obtener producto por id
 router.get('/:id', getProductoById)

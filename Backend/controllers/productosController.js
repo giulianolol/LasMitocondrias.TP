@@ -5,14 +5,15 @@ const db = require(path.join(__dirname, '..', 'models', 'index.js'));
 const Product = db.Product;
 
 //GET /api/productos
-//Devuelve un array de todos los productos con `active = true`.
-
-exports.getProductosActivos = async (req, res) => {
+//Devuelve un array de todos los productos.
+exports.getProductos = async (req, res) => {
   try {
-    const productos = await Product.findAll({ where: { active: true }, order: [['name', 'ASC']]});
+    const productos = await Product.findAll({
+      order: [['name', 'ASC']]
+    });
     return res.status(200).json(productos);
   } catch (err) {
-    console.error('Error en getProductosActivos:', err);
+    console.error('Error en getProductos:', err);
     return res.status(500).json({ error: 'Error al consultar productos' });
   }
 };

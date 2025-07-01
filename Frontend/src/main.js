@@ -893,6 +893,7 @@ function eliminarDelLocalStorage(clave) {
     localStorage.removeItem(clave);
 }
 
+
 async function mostrarProductos() {
     console.log('Cargando productos...');
 
@@ -920,7 +921,13 @@ async function mostrarProductos() {
                 <td>$${producto.price}</td>
                 <td>${producto.active ? 'Sí' : 'No'}</td>
                 <td>
-                    <a class="btn btn-sm btn-warning" onclick="modificarProducto(${producto.id})">Modificar</a>
+                    <div class="form-check form-switch d-inline-block me-2">
+                        <input class="form-check-input" type="checkbox" 
+                               ${producto.active ? 'checked' : ''} 
+                               onchange="toggleProductoEstado(${producto.id}, this.checked, this)"
+                               title="${producto.active ? 'Desactivar producto' : 'Activar producto'}">
+                    </div>
+                    <a class="btn btn-sm btn-warning me-1" onclick="modificarProducto(${producto.id})">Modificar</a>
                     <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id})">Eliminar</button>
                 </td>
             `;
@@ -933,6 +940,49 @@ async function mostrarProductos() {
         mostrarAlerta('Error al cargar productos', 'danger');
     } finally {
         if (spinner) spinner.style.display = 'none';
+    }
+}
+// Función para manejar el cambio de estado del producto - MOMENTANEA
+async function toggleProductoEstado(id, nuevoEstado) {
+    try {
+        // Obtenemos
+        const token = localStorage.getItem('adminToken') || sessionStorage.getItem('token');
+        
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        // Agregamos auth, no sé ya por que no funciona esto
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const res = await fetch(`http://localhost:3000/api/productos/${id}/toggle`, {
+            method: 'PATCH',
+            headers: headers,
+            body: JSON.stringify({ active: nuevoEstado })
+        });
+
+        console.log(res)
+
+        if (!res.ok) throw new Error('Error al actualizar el estado del producto');
+
+        // Actualizar la columna de estado en la tabla
+        const fila = event.target.closest('tr');
+        const columnaEstado = fila.children[3];
+        columnaEstado.textContent = nuevoEstado ? 'Sí' : 'No';
+
+        // Actualizar el tooltip del switch, al final funcionó :)
+        event.target.title = nuevoEstado ? 'Desactivar producto' : 'Activar producto';
+
+        mostrarAlerta(`Producto ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`, 'success');
+        
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta('Error al cambiar el estado del producto', 'danger');
+        
+        // Revertir el switch si hubo error
+        event.target.checked = !nuevoEstado;
     }
 }
 
