@@ -20,23 +20,59 @@ exports.getProductos = async (req, res) => {
 
 //POST /api/productos
 //Crea un nuevo producto. El body debe incluir:
-//{ name, type, price, imageUrl (opcional) }
+//{ name, description, price, stock, active, imageUrl, type }
 
 exports.createProducto = async (req, res) => {
   try {
-    const { name, type, price, imageUrl } = req.body;
-    if (!name || !type || price == null) {
-      return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    const {
+      name,
+      description = null,
+      price,
+      stock = null,
+      active,
+      imageUrl = null,
+      type
+    } = req.body;
+
+    // Validación mínima
+    if (!name || price == null || !type) {
+      return res.status(400).json({ error: 'Faltan datos obligatorios: name, price o type' });
     }
 
-    const nuevo = await Product.create({ name, type, price, imageUrl });
+    const nuevo = await Product.create({
+      name,
+      description,
+      price,
+      stock,
+      active: active === 'true' || active === true,
+      imageUrl,
+      type
+    });
+
     return res.status(201).json(nuevo);
 
   } catch (err) {
+    if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeDatabaseError') {
+      console.error('Sequelize error:', JSON.stringify(err.errors, null, 2));
+      return res.status(400).json({
+        error: 'Error de validación de Sequelize',
+        details: err.errors?.map(e => ({
+          field: e.path,
+          message: e.message,
+          type: e.type,
+          value: e.value
+        }))
+      });
+    }
+
     console.error('Error en createProducto:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({
+      error: 'Error interno del servidor',
+      message: err.message
+    });
   }
 };
+
 
 /**
  * PUT /api/productos/:id

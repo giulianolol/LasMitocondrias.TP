@@ -87,7 +87,22 @@
 
             <div class="mb-3">
                 <label for="imagen" class="form-label">Imagen del Producto</label>
-                <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*" required>
+                <input type="text" class="form-control" id="imagen" name="imagen" accept="image/*" required>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+            <input
+                class="form-check-input"
+                type="checkbox"
+                id="tipoSwitch"
+                name="tipoSwitch"
+            />
+            <label class="form-check-label" for="tipoSwitch">
+                ¿Es un teclado?
+            </label>
+            <small class="form-text text-muted">
+                (si está desmarcado, se guardará como “mouse”)
+            </small>
             </div>
 
             <button type="submit" class="btn btn-primary">Guardar Producto</button>

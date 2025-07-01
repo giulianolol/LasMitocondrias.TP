@@ -1,5 +1,4 @@
 // const { log } = require("console");
-
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
     resaltarNavActivo();
@@ -14,6 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarContadorCarrito();
     mostrarProductos();
     inicializarTema();
+    initAltaFormulario()
+
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', handleSubmit);
+    }
     const loginForm = document.getElementById("loginForm");
     if (loginForm){
         loginForm.addEventListener("submit", handleAdminLogin)
@@ -1227,4 +1232,79 @@ if (texto === null || texto === undefined) {
   }
 
   return textoRecortado.slice(0, ultimoEspacio) + "...";
+}
+
+
+// ALTA PRODUCTIO
+async function altaProducto(producto, token) {
+  const res = await fetch('http://localhost:3000/api/productos', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(producto)
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || err.message || 'Error al crear producto');
+  }
+  return res.json();
+}
+
+// manejar el submit del formulario
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  const token = localStorage.getItem('adminToken');
+  if (!token) {
+    alert('Error en la sesión - TOKEN INVALIDO.');
+    return;
+  }
+
+const ahora = new Date();
+
+const fechaFormateada = ahora.toLocaleString('es-AR', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+});
+
+  const activeValue = document.getElementById('activo').value;
+  const producto = {
+    name:        document.getElementById('nombre').value.trim(),
+    description: document.getElementById('descripcion').value.trim(),
+    price:       parseFloat(document.getElementById('precio').value),
+    stock:       parseInt(document.getElementById('stock').value, 10),
+    active:      activeValue === 'true',
+    imageUrl:    document.getElementById('imagen').value.trim(),
+    type:        document.getElementById('tipoSwitch').checked ? 'teclado' : 'mouse',
+    createdAt: fechaFormateada,
+    updatedAt: fechaFormateada
+    
+  };
+
+  console.log('Payload de altaProducto:', producto)
+
+  try {
+    const creado = await altaProducto(producto, token);
+    console.log(creado)
+    alert(`Producto "${creado.name}" creado con ID ${creado.id}`);
+    document.querySelector('form').reset();
+  } catch (err) {
+    console.log(creado)
+    console.error(err);
+    alert(`No se pudo crear el producto: ${err.message}`);
+  }
+}
+
+// funcion solo para vincular el evento
+function initAltaFormulario() {
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', handleSubmit);
+  }
 }
