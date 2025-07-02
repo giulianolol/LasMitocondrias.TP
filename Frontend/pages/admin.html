@@ -39,14 +39,16 @@
                         <button id="botonTema" class="btn btn-outline-light" onclick="cambiarTema()">
                             🌙
                         </button>
-                        <li class="nav-item"><a href="../index.html" class="nav-link fw-bold">Cerrar
-                                Sesión</a></li>
+                        <li class="nav-item"><a href="../index.html" class="nav-link fw-bold">Ir a Cliente</a></li>
                         <li class="nav-item"><a href="admin.html" class="nav-link  fw-bold">Login</a></li>
-                        <li class="nav-item"><a href="dashboard.html" class="nav-link  fw-bold">Dashboard</a>
+                        <li class="nav-item"><a href="dashboard.html" onclick="return false"
+                                class="nav-link  fw-bold">Dashboard</a>
                         </li>
-                        <li class="nav-item"><a href="altas.html" class="nav-link  fw-bold">Alta de
+                        <li class="nav-item"><a href="altas.html" onclick="return false" class="nav-link  fw-bold">Alta
+                                de
                                 Productos</a></li>
-                        <li class="nav-item"><a href="modificaciones.html" class="nav-link fw-bold">Modificación de
+                        <li class="nav-item"><a href="modificaciones.html" onclick="return false"
+                                class="nav-link fw-bold">Modificación de
                                 Productos</a></li>
                     </ul>
                 </div>
@@ -54,6 +56,9 @@
             </div>
         </nav>
     </header>
+    <div id="alert-container"
+        style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1050; min-width: 300px;">
+    </div>
     <main class="flex-grow-1 d-flex justify-content-center align-items-center py-5 ">
         <div class="card p-4 shadow bg-light" style="max-width: 800px; width: 300%;">
             <h2 class="text-center mb-4">Iniciar Sesión</h2>

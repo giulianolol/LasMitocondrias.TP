@@ -5,37 +5,74 @@ const db = require(path.join(__dirname, '..', 'models', 'index.js'));
 const Product = db.Product;
 
 //GET /api/productos
-//Devuelve un array de todos los productos con `active = true`.
-
-exports.getProductosActivos = async (req, res) => {
+//Devuelve un array de todos los productos.
+exports.getProductos = async (req, res) => {
   try {
-    const productos = await Product.findAll({ where: { active: true }, order: [['name', 'ASC']]});
+    const productos = await Product.findAll({
+      order: [['name', 'ASC']]
+    });
     return res.status(200).json(productos);
   } catch (err) {
-    console.error('Error en getProductosActivos:', err);
+    console.error('Error en getProductos:', err);
     return res.status(500).json({ error: 'Error al consultar productos' });
   }
 };
 
 //POST /api/productos
 //Crea un nuevo producto. El body debe incluir:
-//{ name, type, price, imageUrl (opcional) }
+//{ name, description, price, stock, active, imageUrl, type }
 
 exports.createProducto = async (req, res) => {
   try {
-    const { name, type, price, imageUrl } = req.body;
-    if (!name || !type || price == null) {
-      return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    const {
+      name,
+      description = null,
+      price,
+      stock = null,
+      active,
+      imageUrl = null,
+      type
+    } = req.body;
+
+    // Validación mínima
+    if (!name || price == null || !type) {
+      return res.status(400).json({ error: 'Faltan datos obligatorios: name, price o type' });
     }
 
-    const nuevo = await Product.create({ name, type, price, imageUrl });
+    const nuevo = await Product.create({
+      name,
+      description,
+      price,
+      stock,
+      active: active === 'true' || active === true,
+      imageUrl,
+      type
+    });
+
     return res.status(201).json(nuevo);
 
   } catch (err) {
+    if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeDatabaseError') {
+      console.error('Sequelize error:', JSON.stringify(err.errors, null, 2));
+      return res.status(400).json({
+        error: 'Error de validación de Sequelize',
+        details: err.errors?.map(e => ({
+          field: e.path,
+          message: e.message,
+          type: e.type,
+          value: e.value
+        }))
+      });
+    }
+
     console.error('Error en createProducto:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({
+      error: 'Error interno del servidor',
+      message: err.message
+    });
   }
 };
+
 
 /**
  * PUT /api/productos/:id
@@ -43,6 +80,7 @@ exports.createProducto = async (req, res) => {
  * Body: { name, type, price, imageUrl, active (opcional) }
  */
 exports.updateProducto = async (req, res) => {
+  console.log('Actualizando producto con ID:');
   try {
     // Desestructura TODO lo que viene en el body
     const { name, description, price, stock, type, active } = req.body;

@@ -54,6 +54,9 @@
             </div>
         </nav>
     </header>
+    <div id="alert-container"
+        style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1050; min-width: 300px;">
+    </div>
     <main class="container py-5">
         <h2 class="mb-4">Modificar Producto</h2>
         <form id="formModificar" enctype="multipart/form-data">
@@ -64,8 +67,7 @@
 
             <div class="mb-3">
                 <label for="descripcion" class="form-label">Descripción</label>
-                <textarea class="form-control" id="descripcion" name="descripcion" rows="3"
-                    required></textarea>
+                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
             </div>
 
             <div class="mb-3">
@@ -81,7 +83,7 @@
             <div class="mb-3">
                 <label for="activo" class="form-label">Activo</label>
                 <select class="form-select" id="activo" name="activo" required>
-                    <option value="true" >Si</option>
+                    <option value="true">Si</option>
                     <option value="false">No</option>
                 </select>
             </div>

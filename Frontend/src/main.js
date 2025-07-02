@@ -1,21 +1,26 @@
 // const { log } = require("console");
-
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
-    inicializarTema();
     resaltarNavActivo();
     manejarBienvenida();
     manejarFecha();
     verificarNombre();
-    mostrarTeclados();
     mostrarMouses();
+    mostrarTeclados();
     mostrarTecladosPaginacion();
     configurarBotonesCategorias();
     inicializarCarrito();
     actualizarContadorCarrito();
     mostrarProductos();
+    inicializarTema();
+    initAltaFormulario()
+
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', handleSubmit);
+    }
     const loginForm = document.getElementById("loginForm");
-    if (loginForm){
+    if (loginForm) {
         loginForm.addEventListener("submit", handleAdminLogin)
     }
     //Solo renderiza el carrito cuando estamos en la página del carrito
@@ -23,67 +28,68 @@ document.addEventListener("DOMContentLoaded", () => {
         renderizarCarrito();
     }
     if (document.getElementById('ticket-body')) {
-    renderTicketPage();
+        renderTicketPage();
     }
 
-    
+
     //Si estamos en modificaciones.html leemos el producto y podemos llenar el formulad
     if (location.pathname.endsWith('modificaciones.html')) {
         cargarProductoParaModificar();
 
         const form = document.getElementById('formModificar');
         if (form) {
-        form.addEventListener('submit', guardarCambiosProducto);
+            form.addEventListener('submit', guardarCambiosProducto);
         }
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         const productoJSON = localStorage.getItem('productoParaModificar');
         if (!productoJSON) return console.warn('No hay producto para modificar en localStorage');
-        
+
         const producto = JSON.parse(productoJSON);
         if (String(producto.id) !== id) {
             console.warn('El ID de la URL y el de localStorage no coinciden');
             return;
-        }}
+        }
+    }
 
-        document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
-        document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
-    });
-    
-    let carrito = [];
-    
-    //LOGIN
-    async function handleAdminLogin(event) {
-        event.preventDefault();
-        event.stopPropagation();
+    document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
+    document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
+});
+
+let carrito = [];
+
+//LOGIN
+async function handleAdminLogin(event) {
+    event.preventDefault();
+    event.stopPropagation();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
-    const errorDiv = document.getElementById("loginError");
+    // const errorDiv = document.getElementById("loginError");
 
     // Limpiar errores previos
-    if (errorDiv) {
-        errorDiv.style.display = "none";
-        errorDiv.textContent = "";
-    }
+    // if (errorDiv) {
+    //     errorDiv.style.display = "none";
+    //     errorDiv.textContent = "";
+    // }
 
     //DESCOMENTAR PARA DEBUGEAR EL FRONTEND - YA FUNCIONA (24/6)
     // console.log("=== DEBUG FRONTEND ===");
     // console.log("Email:", email);
     // console.log("ESTA ES LA PASS: " + password)
     // console.log("Password:", password ? "***" : "vacío");
-    
+
 
     try {
         console.log("Enviando request a:", "http://localhost:3000/api/administradores/login");
 
         const res = await fetch("http://localhost:3000/api/administradores/login", {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json" 
+            headers: {
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({ email, password })
-            
+
         });
 
         console.log("Response status:", res.status);
@@ -93,7 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const responseData = await res.json();
         console.log("Response data:", responseData);
 
-        if (!res.ok) {
+        if (!res.status.toString().startsWith("2")) {
+            mostrarAlerta("Credenciales inválidas", "danger");
             throw new Error(responseData.error || "Credenciales inválidas");
         }
 
@@ -104,44 +111,47 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("adminToken", token);
 
         // Redirigimos al dashboard
-        window.location.href = "dashboard.html";
-        
+        mostrarAlerta("Login exitoso. Redirigiendo al dashboard...", "success");
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 2000);
+
     } catch (err) {
         console.error("Login error:", err);
-        
+
         // Mostrar error solo si existe el elemento
-        if (errorDiv) {
-            errorDiv.textContent = err.message;
-            errorDiv.style.display = "block";
-        } else {
-            // Fallback si no existe el div de error
-            alert("Error: " + err.message);
-        }
+        // if (errorDiv) {
+        //     errorDiv.textContent = err.message;
+        //     errorDiv.style.display = "block";
+        // } else {
+        //     // Fallback si no existe el div de error
+        //     alert("Error: " + err.message);
+        // }
     }
 }
 
 //FUNCION PARA CREAR PRODUCTO
 async function crearProducto(nuevoProducto) {
-  const token = localStorage.getItem("adminToken");
-  if (!token) return window.location.href = "admin.html"; //VA A SALIR POR ACÁ SI NO ESTÁ LOGEADO =)
+    const token = localStorage.getItem("adminToken");
+    if (!token) return window.location.href = "admin.html"; //VA A SALIR POR ACÁ SI NO ESTÁ LOGEADO =)
 
     const res = await fetch("http://localhost:3000/api/productos", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify(nuevoProducto)
-  });
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(nuevoProducto)
+    });
 
-if (!res.ok) throw new Error("No autorizado o fallo al crear producto");
-  return await res.json();
+    if (!res.ok) throw new Error("No autorizado o fallo al crear producto");
+    return await res.json();
 }
 
 // FUNCIÓN PARA PROBAR SI EL TOKEN EXPIRÓ - hecha para devs o para debugear ;)
 function isTokenExpired(token) {
-  const payload = JSON.parse(atob(token.split(".")[1]));
-  return Date.now() >= payload.exp * 1000;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return Date.now() >= payload.exp * 1000;
 }
 
 // CARRITO
@@ -319,19 +329,6 @@ function actualizarContadorCarrito() {// Actualizar contador en navbar si existe
     }
 }
 
-// function procederCompra() {
-//     // Pregunto al usuario si está seguro
-//     // const confirmado = window.confirm("¿Estás seguro de que quieres finalizar la compra?");
-//     const confirmado = true; // Para pruebas, siempre confirmo
-//     if (confirmado) {
-//         //redirijo
-//         window.location.href = "http://127.0.0.1:5500/Frontend/pages/ticket.html";
-//     }
-//     else {
-//         //  aviso opcional
-//         mostrarAlerta("No se completó la compra", "info");
-//     }
-// }
 
 function agregarAlCarrito(producto) {
     const productoExistente = carrito.find(item => item.id === producto.id);
@@ -499,7 +496,7 @@ function inicializarTema() {
 
         if (card) {
             card.classList.remove('bg-light');
-            card.classList.add('bg-dark', 'text-white');
+            // card.classList.add('bg-dark', 'text-white');
         }
 
         if (navbar) {
@@ -519,10 +516,6 @@ function inicializarTema() {
         body.classList.remove('bg-dark', 'text-white');
         body.classList.add('bg-body-secondary');
 
-        if (card) {
-            card.classList.remove('bg-dark', 'text-white');
-            card.classList.add('bg-light');
-        }
 
         if (navbar) {
             navbar.classList.remove('bg-completly-black', 'text-white', 'sombra-suave', 'borde-inferior');
@@ -606,6 +599,8 @@ async function mostrarTeclados() {
                         <p class="card-text text-white">Tipo: ${teclado.type}</p>
                         <p class="card-text text-white">Precio: $${teclado.price}</p>
                         <p class="card-text text-success">Estado: ${teclado.active}</p>
+                        <p class="card-text ">Stock: ${teclado.stock == null ? "Sin stock" : teclado.stock}</p>
+                        <p class="card-text ">Descripción: ${acortarDescripcion(teclado.description, 100)}</p>
                     </div>
                 </div>
             `;
@@ -614,6 +609,7 @@ async function mostrarTeclados() {
         });
 
     } catch (err) {
+        console.log('Error al cargar teclados:', err);
         mostrarAlerta('Error al cargar teclados', 'danger');
     } finally {
         spinner.style.display = 'none';
@@ -656,6 +652,8 @@ async function mostrarMouses() {
                         <p class="card-text">Tipo: ${mouse.type}</p>
                         <p class="card-text">Precio: $${mouse.price}</p>
                         <p class="card-text text-success">Estado: ${mouse.active}</p>
+                        <p class="card-text">Stock: ${mouse.stock}</p>
+                        <p class="card-text ">Descripción: ${acortarDescripcion(mouse.description, 100)}</p>
                         <div class="mt-auto">
                             <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(mouse).replace(/"/g, '&quot;')})">
                                 <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
@@ -715,13 +713,15 @@ function renderizarPaginaTeclados() {
         const col = document.createElement('div');
         col.className = 'col-md-4 mb-4';
         col.innerHTML = `
-            <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
+            <div  class="card bg-dark text-white h-100 shadow-sm rounded-4 teclados">
                 <img src="${teclado.imageUrl}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${teclado.name}" />
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${teclado.name}</h5>
                     <p class="card-text">Tipo: ${teclado.type}</p>
                     <p class="card-text">Precio: $${teclado.price}</p>
                     <p class="card-text text-success">Estado: ${teclado.active}</p>
+                    <p class="card-text ">Stock: ${teclado.stock == null ? "Sin stock" : teclado.stock}</p>
+                    <p class="card-text ">Descripción: ${acortarDescripcion(teclado.description, 100)}</p>
                     <div class="mt-auto">
                         <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(teclado).replace(/"/g, '&quot;')})">
                             <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
@@ -835,6 +835,8 @@ function renderizarPaginaMouses() {
                     <p class="card-text">Tipo: ${mouse.type}</p>
                     <p class="card-text">Precio: $${mouse.price}</p>
                     <p class="card-text text-success">Estado: ${mouse.active}</p>
+                    <p class="card-text">Stock: ${mouse.stock == null ? "Sin stock" : mouse.stock}</p>
+                    <p class="card-text">Descripción: ${acortarDescripcion(mouse.description, 100)}</p>
                     <div class="mt-auto">
                         <button class="btn btn-primary w-100" onclick="agregarAlCarrito(${JSON.stringify(mouse).replace(/"/g, '&quot;')})">
                             <i class="fas fa-shopping-cart me-2"></i>Agregar al carrito
@@ -884,6 +886,7 @@ function eliminarDelLocalStorage(clave) {
     localStorage.removeItem(clave);
 }
 
+
 async function mostrarProductos() {
     console.log('Cargando productos...');
 
@@ -911,7 +914,13 @@ async function mostrarProductos() {
                 <td>$${producto.price}</td>
                 <td>${producto.active ? 'Sí' : 'No'}</td>
                 <td>
-                    <a class="btn btn-sm btn-warning" onclick="modificarProducto(${producto.id})">Modificar</a>
+                    <div class="form-check form-switch d-inline-block me-2">
+                        <input class="form-check-input" type="checkbox" 
+                               ${producto.active ? 'checked' : ''} 
+                               onchange="toggleProductoEstado(${producto.id}, this.checked, this)"
+                               title="${producto.active ? 'Desactivar producto' : 'Activar producto'}">
+                    </div>
+                    <a class="btn btn-sm btn-warning me-1" onclick="modificarProducto(${producto.id})">Modificar</a>
                     <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id})">Eliminar</button>
                 </td>
             `;
@@ -926,54 +935,94 @@ async function mostrarProductos() {
         if (spinner) spinner.style.display = 'none';
     }
 }
+// Función para manejar el cambio de estado del producto - MOMENTANEA
+async function toggleProductoEstado(id, nuevoEstado) {
+    try {
+        // Obtenemos
+        const token = localStorage.getItem('adminToken') || sessionStorage.getItem('token');
+
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        // Agregamos auth, no sé ya por que no funciona esto
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const res = await fetch(`http://localhost:3000/api/productos/${id}/toggle`, {
+            method: 'PATCH',
+            headers: headers,
+            body: JSON.stringify({ active: nuevoEstado })
+        });
+
+        console.log(res)
+
+        if (!res.ok) throw new Error('Error al actualizar el estado del producto');
+
+        // Actualizar la columna de estado en la tabla
+        const fila = event.target.closest('tr');
+        const columnaEstado = fila.children[3];
+        columnaEstado.textContent = nuevoEstado ? 'Sí' : 'No';
+
+        // Actualizar el tooltip del switch, al final funcionó :)
+        event.target.title = nuevoEstado ? 'Desactivar producto' : 'Activar producto';
+
+        mostrarAlerta(`Producto ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`, 'success');
+
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta('Error al cambiar el estado del producto', 'danger');
+
+        // Revertir el switch si hubo error
+        event.target.checked = !nuevoEstado;
+    }
+}
 
 async function eliminarProducto(id) {
-  // Confirmación en el cliente
-  const confirmado = confirm(`¿Estás seguro de eliminar el producto con ID ${id}?`);
-  if (!confirmado) return;
 
-  try {
-    //Obtener el token de admin
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      alert('ERROR No tienes un token de administrador. Por favor, inicia sesión de nuevo.');
-      return;
+    try {
+        //Obtener el token de admin
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            mostrarAlerta('No tienes un token de administrador. Por favor, inicia sesión de nuevo.', 'danger');
+            return;
+        }
+
+        //Llamada a la API
+        const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+
+        });
+
+        //Manejo de respuestas HTTP
+        if (res.status === 401) {
+            mostrarAlerta('ERROR No autorizado. Inicia sesión como administrador.', 'danger');
+            return;
+        }
+        if (res.status === 404) {
+            mostrarAlerta(`ERROR Producto con ID ${id} no encontrado.`, 'danger');
+            return;
+        }
+        if (!res.ok) {
+            // otros errores de servidor
+            const errorText = await res.text();
+            mostrarAlerta(`Error al eliminar (status ${res.status}): ${errorText}`, 'danger');
+            return;
+        }
+
+        //Éxito
+        mostrarAlerta('OK Producto eliminado correctamente', 'success');
+        mostrarProductos(); // recargamos tu tabla o galería
+
+    } catch (error) {
+        console.error('Error al eliminar producto:', error);
+        mostrarAlerta('ALERT Ocurrió un error inesperado al eliminar el producto.', 'danger');
     }
-
-    //Llamada a la API
-    const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-      
-    });
-
-    //Manejo de respuestas HTTP
-    if (res.status === 401) {
-      alert('ERROR No autorizado. Inicia sesión como administrador.');
-      return;
-    }
-    if (res.status === 404) {
-      alert(`ERROR Producto con ID ${id} no encontrado.`);
-      return;
-    }
-    if (!res.ok) {
-      // otros errores de servidor
-      const errorText = await res.text();
-      alert(`Error al eliminar (status ${res.status}): ${errorText}`);
-      return;
-    }
-
-    //Éxito
-    alert('OK Producto eliminado correctamente');
-    mostrarProductos(); // recargamos tu tabla o galería
-
-  } catch (error) {
-    console.error('Error al eliminar producto:', error);
-    alert('ALERT Ocurrió un error inesperado al eliminar el producto.');
-  }
 }
 
 //TICKET
@@ -1012,139 +1061,240 @@ function renderTicketPage() {
 }
 
 function calcularTotalCarrito() {
-  return carrito.reduce((acumulado, item) => {
-    const precio = parseFloat(item.price);
-    const cantidad = item.cantidad || 1;
-    return acumulado + precio * cantidad;
-  }, 0);
+    return carrito.reduce((acumulado, item) => {
+        const precio = parseFloat(item.price);
+        const cantidad = item.cantidad || 1;
+        return acumulado + precio * cantidad;
+    }, 0);
 }
 
 //MODIFICACIÖN
 async function modificarProducto(id) {
 
-  try {
-    const token = localStorage.getItem('adminToken');
-    const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (!res.ok) throw new Error('Error al obtener el producto');
-    const producto = await res.json();
-    localStorage.setItem('productoParaModificar', JSON.stringify(producto));
-    // Llevamos el id en la query string (creo que no es necesario igualmente)
-    window.location.href = `modificaciones.html?id=${id}`;
-  } catch (err) {
-    console.error(err);
-    alert('No se pudo preparar la modificación del producto.');
-  }
+    try {
+        const token = localStorage.getItem('adminToken');
+        console.log('Token de administrador:', token);
+        const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Error al obtener el producto');
+        const producto = await res.json();
+        localStorage.setItem('productoParaModificar', JSON.stringify(producto));
+        // Llevamos el id en la query string (creo que no es necesario igualmente)
+        window.location.href = `modificaciones.html?id=${id}`;
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta('No se pudo preparar la modificación del producto.', 'danger');
+    }
 
 }
 
-function cargarProductoParaModificar() {const productoJSON = localStorage.getItem('productoParaModificar');
-  if (!productoJSON) {
-    console.warn('No hay producto para modificar en localStorage');
-    return;
-  }
-  const p = JSON.parse(productoJSON);
-  
-  console.log(p)
+function cargarProductoParaModificar() {
+    const productoJSON = localStorage.getItem('productoParaModificar');
+    if (!productoJSON) {
+        console.warn('No hay producto para modificar en localStorage');
+        return;
+    }
+    const p = JSON.parse(productoJSON);
 
-  // Campo oculto para el ID
-  let inputId = document.getElementById('productoId');
-  if (!inputId) {
-    inputId = document.createElement('input');
-    inputId.type = 'hidden';
-    inputId.id   = 'productoId';
-    document.querySelector('form').prepend(inputId);
-  }
-  inputId.value = p.id;
+    console.log(p)
 
-  // Nombre
-  const nombre = document.getElementById('nombre');
-  if (nombre) nombre.value = p.name || '';
+    // Campo oculto para el ID
+    let inputId = document.getElementById('productoId');
+    if (!inputId) {
+        inputId = document.createElement('input');
+        inputId.type = 'hidden';
+        inputId.id = 'productoId';
+        document.querySelector('form').prepend(inputId);
+    }
+    inputId.value = p.id;
 
-  // Descripción
-  const descripcion = document.getElementById('descripcion');
-  if (descripcion) descripcion.value = p.description || '';
+    // Nombre
+    const nombre = document.getElementById('nombre');
+    if (nombre) nombre.value = p.name || '';
 
-  // Precio
-  const precio = document.getElementById('precio');
-  if (precio) precio.value = p.price || '';
+    // Descripción
+    const descripcion = document.getElementById('descripcion');
+    if (descripcion) descripcion.value = p.description || '';
 
-  // Stock
-  const stock = document.getElementById('stock');
-  if (stock) stock.value = p.stock || '';
+    // Precio
+    const precio = document.getElementById('precio');
+    if (precio) precio.value = p.price || '';
 
-  // Activo
-  const activo = document.getElementById('activo');
-  if (activo) activo.value = String(p.active);
+    // Stock
+    const stock = document.getElementById('stock');
+    if (stock) stock.value = p.stock || '';
 
-  // Tipo
-  const tipo = document.getElementById('type');
-  if (tipo) tipo.value = p.type || '';
+    // Activo
+    const activo = document.getElementById('activo');
+    if (activo) activo.value = String(p.active);
 
-  // Preview de imagen
-  const fileInput = document.getElementById('imagen');
-  if (fileInput) {
-    const preview = document.createElement('img');
-    preview.src = p.imageUrl;
-    preview.alt = 'Imagen actual';
-    preview.style.maxWidth = '200px';
-    preview.style.display = 'block';
-    preview.style.marginTop = '0.5rem';
-    fileInput.parentNode.append(preview);
-  }
+    // Tipo
+    const tipo = document.getElementById('type');
+    if (tipo) tipo.value = p.type || '';
 
-  // Metadatos de creación y actualización
-  const contenedor = document.querySelector('main.container') || document.body;
-  const meta = document.createElement('p'); //creamos un parrafo "dinamico"
-  meta.innerText = `Creado: ${new Date(p.createdAt).toLocaleString()} | Actualizado: ${new Date(p.updatedAt).toLocaleString()}`; //le asignamos el texto con las fechas
-  contenedor.prepend(meta); // añadimos el parrafo antes de cualquier otro hijo, así el "meta" queda arriba/primero
+    // Preview de imagen
+    const fileInput = document.getElementById('imagen');
+    if (fileInput) {
+        const preview = document.createElement('img');
+        preview.src = p.imageUrl;
+        preview.alt = 'Imagen actual';
+        preview.style.maxWidth = '200px';
+        preview.style.display = 'block';
+        preview.style.marginTop = '0.5rem';
+        fileInput.parentNode.append(preview);
+    }
+
+    // Metadatos de creación y actualización
+    const contenedor = document.querySelector('main.container') || document.body;
+    const meta = document.createElement('p'); //creamos un parrafo "dinamico"
+    meta.innerText = `Creado: ${new Date(p.createdAt).toLocaleString()} | Actualizado: ${new Date(p.updatedAt).toLocaleString()}`; //le asignamos el texto con las fechas
+    contenedor.prepend(meta); // añadimos el parrafo antes de cualquier otro hijo, así el "meta" queda arriba/primero
 }
 
 async function guardarCambiosProducto(e) {
-  e.preventDefault(); // evita que recargue la página
+    e.preventDefault(); // evita que recargue la página
 
-  const id = document.getElementById('productoId').value;
-  const name = document.getElementById('nombre').value;
-  const description = document.getElementById('descripcion').value;
-  const price = document.getElementById('precio').value;
-  const stock = document.getElementById('stock').value;
-  const active = document.getElementById('activo').value === 'true';
-  const token = localStorage.getItem('adminToken');
+    const id = document.getElementById('productoId').value;
+    const name = document.getElementById('nombre').value;
+    const description = document.getElementById('descripcion').value;
+    const price = document.getElementById('precio').value;
+    const stock = document.getElementById('stock').value;
+    const active = document.getElementById('activo').value === 'true';
+    const token = localStorage.getItem('adminToken');
 
-  const payload = {
-    name,
-    description,
-    price,
-    stock,
-    active
-  };
+    const payload = {
+        name,
+        description,
+        price,
+        stock,
+        active
+    };
 
-  console.log(payload)
+    console.log(payload)
 
-  try {
-    const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
+    try {
+        const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Error al actualizar el producto');
+        }
+
+        mostrarAlerta('Producto actualizado con éxito', 'success');
+
+        // Limpiamos y redirigimos
+        localStorage.removeItem('productoParaModificar');
+        window.location.href = 'dashboard.html';
+    } catch (err) {
+        console.error(err);
+        mostrarAlerta('Error al guardar cambios: ' + err.message, 'danger');
+    }
+}
+
+function acortarDescripcion(texto, maxCaracteres) {
+
+    if (texto === null || texto === undefined) {
+        return "Sin descripción disponible";
+    }
+    if (texto.length <= maxCaracteres) {
+        return texto;
+    }
+
+    const textoRecortado = texto.slice(0, maxCaracteres);
+
+    // Cortar en el último espacio para no partir palabras
+    const ultimoEspacio = textoRecortado.lastIndexOf(" ");
+
+    if (ultimoEspacio === -1) {
+        return textoRecortado + "...";
+    }
+
+    return textoRecortado.slice(0, ultimoEspacio) + "...";
+}
+
+
+// ALTA PRODUCTIO
+async function altaProducto(producto, token) {
+    const res = await fetch('http://localhost:3000/api/productos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(producto)
     });
 
     if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'Error al actualizar el producto');
+        const err = await res.json();
+        throw new Error(err.error || err.message || 'Error al crear producto');
+    }
+    return res.json();
+}
+
+// manejar el submit del formulario
+async function handleSubmit(e) {
+    e.preventDefault();
+
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        ('Error en la sesión - TOKEN INVALIDO.');
+        return;
     }
 
-    alert('Producto actualizado con éxito');
+    const ahora = new Date();
 
-    // Limpiamos y redirigimos
-    localStorage.removeItem('productoParaModificar');
-    window.location.href = 'dashboard.html';
-  } catch (err) {
-    console.error(err);
-    alert('Error al guardar cambios: ' + err.message);
-  }
+    const fechaFormateada = ahora.toLocaleString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const activeValue = document.getElementById('activo').value;
+    const producto = {
+        name: document.getElementById('nombre').value.trim(),
+        description: document.getElementById('descripcion').value.trim(),
+        price: parseFloat(document.getElementById('precio').value),
+        stock: parseInt(document.getElementById('stock').value, 10),
+        active: activeValue === 'true',
+        imageUrl: document.getElementById('imagen').value.trim(),
+        type: document.getElementById('tipoSwitch').checked ? 'teclado' : 'mouse',
+        createdAt: fechaFormateada,
+        updatedAt: fechaFormateada
+
+    };
+
+    console.log('Payload de altaProducto:', producto)
+
+    try {
+        const creado = await altaProducto(producto, token);
+        console.log(creado)
+        mostrarAlerta(`Producto "${creado.name}" creado con ID ${creado.id}`, 'success');
+        setTimeout(() => {
+            window.location.href = 'dashboard.html'; // redirigir al dashboard
+        }, 2000);
+        // Limpiar el formulario
+        document.querySelector('form').reset();
+    } catch (err) {
+        console.log(creado)
+        console.error(err);
+        mostrarAlerta(`No se pudo crear el producto: ${err.message}`, 'danger');
+    }
+}
+
+// funcion solo para vincular el evento
+function initAltaFormulario() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', handleSubmit);
+    }
 }
