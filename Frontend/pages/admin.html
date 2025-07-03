@@ -65,13 +65,15 @@
             <form id="loginForm">
                 <div class="mb-3">
                     <label for="email" class="form-label">Correo electrónico</label>
-                    <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
+                    <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" >
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="password" placeholder="Contraseña" required>
+                    <input type="password" class="form-control" id="password" placeholder="Contraseña" >
                 </div>
-                <button type="submit" class="btn btn-dark w-100">Ingresar</button>
+                <button type="submit" id="loginButton" class="btn btn-dark w-100">Ingresar</button>
+                <hr class="my-4">
+                <button type="button" id="testButton" class="btn btn-dark w-100">Test</button>
             </form>
         </div>
     </main>

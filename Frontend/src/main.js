@@ -1,3 +1,6 @@
+// const { getEventListeners } = require("events");
+let isTestLogin = false; // Bandera para saber si es test
+
 // const { log } = require("console");
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,13 +18,18 @@ document.addEventListener("DOMContentLoaded", () => {
     inicializarTema();
     initAltaFormulario()
 
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', handleSubmit);
-    }
+    const testButton = document.getElementById("testButton");
     const loginForm = document.getElementById("loginForm");
+
+    if (testButton) {
+        testButton.addEventListener("click", () => {
+            isTestLogin = true;
+            loginForm.requestSubmit(); // Forzar submit del formulario
+        });
+    }
+
     if (loginForm) {
-        loginForm.addEventListener("submit", handleAdminLogin)
+        loginForm.addEventListener("submit", handleAdminLogin);
     }
     //Solo renderiza el carrito cuando estamos en la página del carrito
     if (document.getElementById('carrito-contenido')) {
@@ -59,74 +67,54 @@ document.addEventListener("DOMContentLoaded", () => {
 let carrito = [];
 
 //LOGIN
+
 async function handleAdminLogin(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    // const errorDiv = document.getElementById("loginError");
+    let email, password;
 
-    // Limpiar errores previos
-    // if (errorDiv) {
-    //     errorDiv.style.display = "none";
-    //     errorDiv.textContent = "";
-    // }
+    if (isTestLogin) {
+        console.log("Test login activado");
+        email = "solotest@test.com";
+        password = "password123";
+    } else {
+        console.log("Login normal");
+        email = document.getElementById("email").value.trim();
+        password = document.getElementById("password").value.trim();
+    }
 
-    //DESCOMENTAR PARA DEBUGEAR EL FRONTEND - YA FUNCIONA (24/6)
-    // console.log("=== DEBUG FRONTEND ===");
-    // console.log("Email:", email);
-    // console.log("ESTA ES LA PASS: " + password)
-    // console.log("Password:", password ? "***" : "vacío");
+    console.log("Email to send:", email);
+    console.log("Password to send:", password);
 
+    isTestLogin = false; // Resetear la bandera
 
     try {
-        console.log("Enviando request a:", "http://localhost:3000/api/administradores/login");
-
         const res = await fetch("http://localhost:3000/api/administradores/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ email, password })
-
         });
 
-        console.log("Response status:", res.status);
-        console.log("Response ok:", res.ok);
-
-        // Leer la respuesta
         const responseData = await res.json();
-        console.log("Response data:", responseData);
 
-        if (!res.status.toString().startsWith("2")) {
+        if (!res.ok) {
             mostrarAlerta("Credenciales inválidas", "danger");
             throw new Error(responseData.error || "Credenciales inválidas");
         }
 
         const { token } = responseData;
-        console.log("Token recibido:", token ? "OK" : "ERROR EN TOKEN");
-
-        // Guardamos el JWT en localStorage
         localStorage.setItem("adminToken", token);
 
-        // Redirigimos al dashboard
         mostrarAlerta("Login exitoso. Redirigiendo al dashboard...", "success");
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 2000);
-
     } catch (err) {
         console.error("Login error:", err);
-
-        // Mostrar error solo si existe el elemento
-        // if (errorDiv) {
-        //     errorDiv.textContent = err.message;
-        //     errorDiv.style.display = "block";
-        // } else {
-        //     // Fallback si no existe el div de error
-        //     alert("Error: " + err.message);
-        // }
+        mostrarAlerta("Error al iniciar sesión: " + err.message, "danger");
     }
 }
 
