@@ -2,7 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define(
-    'Administrator',
+    'usuarios',
     {
       id: {
         type: DataTypes.BIGINT,
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     {
-      tableName: 'administrators',
+      tableName: 'usuarios',
       timestamps: true, // createdAt / updatedAt
     }
   );

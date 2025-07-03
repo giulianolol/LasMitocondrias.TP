@@ -285,6 +285,8 @@ function vaciarCarritoConfirmado() {
 
 function procederCompra() {
 
+    console.log("ESTOY ACA")
+    
     if (carrito.length === 0) {
         mostrarAlerta('Tu carrito está vacío', 'warning');
         return;
@@ -328,19 +330,7 @@ function actualizarContadorCarrito() {// Actualizar contador en navbar si existe
     }
 }
 
-// function procederCompra() {
-//     // Pregunto al usuario si está seguro
-//     // const confirmado = window.confirm("¿Estás seguro de que quieres finalizar la compra?");
-//     const confirmado = true; // Para pruebas, siempre confirmo
-//     if (confirmado) {
-//         //redirijo
-//         window.location.href = "http://127.0.0.1:5500/Frontend/pages/ticket.html";
-//     }
-//     else {
-//         //  aviso opcional
-//         mostrarAlerta("No se completó la compra", "info");
-//     }
-// }
+
 
 function agregarAlCarrito(producto) {
     const productoExistente = carrito.find(item => item.id === producto.id);
