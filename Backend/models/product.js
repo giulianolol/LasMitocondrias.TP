@@ -2,6 +2,11 @@
 
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('Product', {
+    id_product: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -10,11 +15,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('mouse', 'teclado'),
       allowNull: false,
     },
-    stock:{
+    stock: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    description:{
+    description: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
