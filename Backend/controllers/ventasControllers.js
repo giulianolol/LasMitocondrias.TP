@@ -13,23 +13,21 @@ const Product = db.Product;
  */
 
 exports.createVenta = async (req, res) => {
+
+  console.log("Estoy acá")
+
   try {
-    const { id_producto, nombre_usuario } = req.body;
+    const { nombre_usuario } = req.body;
 
-    if (!id_producto || !nombre_usuario) {
-      return res.status(400).json({ error: 'Faltan datos obligatorios' });
-    }
-
-    // Chequear que el producto exista y esté activo
-    const producto = await Product.findOne({
-      where: { id: id_producto, active: true },
-    });
-    if (!producto) {
-      return res.status(404).json({ error: 'Producto no encontrado o no activo' });
+    if (!nombre_usuario) {
+      return res.status(400).json({ error: 'Falta el nombre del usuario' });
     }
 
     // Crear la venta
-    const nuevaVenta = await Venta.create({ id_producto, nombre_usuario });
+    const nuevaVenta = await Venta.create({
+      nombre_usuario,
+    });
+
     return res.status(201).json(nuevaVenta);
   } catch (err) {
     console.error('Error en createVenta:', err);
