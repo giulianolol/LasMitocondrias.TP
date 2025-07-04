@@ -262,33 +262,55 @@ function vaciarCarritoConfirmado() {
     mostrarAlerta('Carrito vaciado completamente', 'success');
 }
 
-function procederCompra() {
-
+async function procederCompra() {
     if (carrito.length === 0) {
         mostrarAlerta('Tu carrito está vacío', 'warning');
         return;
     }
 
-    // Guardar información de la compra para el ticket
-    const compra = {
-        productos: [...carrito],
-        total: calcularTotalCarrito(),
-        fecha: obtenerFecha(),
-        cliente: localStorage.getItem('nombreCliente') || 'Cliente'
-    };
+    const nombreUsuario = localStorage.getItem('nombreCliente') || 'Cliente';
 
-    localStorage.setItem('ultimaCompra', JSON.stringify(compra));
+    try {
+        // Crear una venta
+        const res = await fetch('http://localhost:3000/api/ventas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre_usuario: nombreUsuario }) 
+        });
 
-    // Limpiar carrito
-    carrito = [];
-    guardarCarrito();
-    actualizarContadorCarrito();
+        if (!res.ok) {
+            const error = await res.json();
+            console.error('Error al registrar venta:', error);
+            mostrarAlerta('Error al registrar la venta', 'danger');
+            return;
+        }
 
-    mostrarAlerta('¡Compra realizada con éxito! Redirigiendo al ticket...', 'success');
+        const venta = await res.json();
+        console.log('Venta registrada:', venta);
 
-    setTimeout(() => {
-        window.location.href = 'ticket.html';
-    }, 2000);
+        // Guardar info para el ticket
+        const compra = {
+            productos: [...carrito],
+            total: calcularTotalCarrito(),
+            fecha: obtenerFecha(),
+            cliente: nombreUsuario
+        };
+
+        localStorage.setItem('ultimaCompra', JSON.stringify(compra));
+
+        carrito = [];
+        guardarCarrito();
+        actualizarContadorCarrito();
+
+        mostrarAlerta('¡Compra realizada con éxito! Redirigiendo al ticket...', 'success');
+        setTimeout(() => {
+            window.location.href = 'ticket.html';
+        }, 2000);
+
+    } catch (err) {
+        console.error('Error al procesar la compra:', err);
+        mostrarAlerta('Ocurrió un error inesperado', 'danger');
+    }
 }
 
 function actualizarContadorCarrito() {// Actualizar contador en navbar si existe
