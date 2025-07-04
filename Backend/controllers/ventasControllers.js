@@ -13,7 +13,6 @@ const Product = db.Product;
  */
 
 exports.createVenta = async (req, res) => {
-
   console.log("Estoy acá")
 
   try {
@@ -23,8 +22,31 @@ exports.createVenta = async (req, res) => {
       return res.status(400).json({ error: 'Falta el nombre del usuario' });
     }
 
+    // Generar id_venta único y corto
+    let id_venta;
+    let ventaExiste = true;
+    
+    // Asegurar que el ID no exista ya
+    while (ventaExiste) {
+      const ahora = new Date();
+      id_venta = parseInt(
+          ahora.getDate().toString().padStart(2, '0') +
+          ahora.getHours().toString().padStart(2, '0') +
+          ahora.getMinutes().toString().padStart(2, '0') +
+          ahora.getSeconds().toString().padStart(2, '0') +
+          Math.floor(Math.random() * 100).toString().padStart(2, '0')
+      );
+      
+      // Verificar si ya existe
+      const existeVenta = await Venta.findOne({ where: { id_venta } });
+      if (!existeVenta) {
+        ventaExiste = false;
+      }
+    }
+
     // Crear la venta
     const nuevaVenta = await Venta.create({
+      id_venta,
       nombre_usuario,
     });
 
