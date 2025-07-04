@@ -2,6 +2,8 @@
 Sohrobigarat Giuliano. Tanoni Matias.
 Repositorio del segundo parcial de programación 3 Sohrobigarat - Tanoni
 
+# IMPORTANTE: EJECUTAR EL setup_backend.sh para instalar las dependencias
+
 SETUP: setup_backend = Ejecutar este script para instalar las dependencias.
 
 -BACKEND:
