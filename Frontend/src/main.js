@@ -1,8 +1,5 @@
-// const { getEventListeners } = require("events");
-let isTestLogin = false; // Bandera para saber si es test
 
-// const { log } = require("console");
-console.log("main cargado")
+let isTestLogin = false; // Bandera para saber si es test
 document.addEventListener("DOMContentLoaded", () => {
     resaltarNavActivo();
     manejarBienvenida();
@@ -75,17 +72,12 @@ async function handleAdminLogin(event) {
     let email, password;
 
     if (isTestLogin) {
-        console.log("Test login activado");
         email = "solotest@test.com";
         password = "password123";
     } else {
-        console.log("Login normal");
         email = document.getElementById("email").value.trim();
         password = document.getElementById("password").value.trim();
     }
-
-    console.log("Email to send:", email);
-    console.log("Password to send:", password);
 
     isTestLogin = false; // Resetear la bandera
 
@@ -146,7 +138,6 @@ function isTokenExpired(token) {
 function inicializarCarrito() {
     const carritoLS = localStorage.getItem('carrito');
     carrito = carritoLS ? JSON.parse(carritoLS) : [];
-    console.log(carrito)
 }
 
 function renderizarCarrito() {
@@ -183,7 +174,6 @@ function renderizarCarrito() {
     if (btnVaciar) btnVaciar.disabled = false;
 
     // carritoLocal = localStorage.getItem('carrito')
-    // console.log(carritoLocal)
 
     // Generar HTML de los productos
     contenidoCarrito.innerHTML = `
@@ -335,7 +325,6 @@ function agregarAlCarrito(producto) {
     guardarCarrito();
     actualizarContadorCarrito();
     renderizarCarrito(); // Actualizar vista si estamos en la página del carrito
-    console.log(carritoTest)
 }
 
 function guardarCarrito() {
@@ -552,7 +541,6 @@ function mostrarAlerta(mensaje, tipo = "success", duracion = 3000) {
 }
 
 async function mostrarTeclados() {
-    console.log('Cargando teclados...');
 
     const contenedor = document.querySelector('#seccion-teclados .row');
     const spinner = document.getElementById('spinner');
@@ -565,20 +553,16 @@ async function mostrarTeclados() {
 
     try {
         const res = await fetch('http://localhost:3000/api/productos');
-        console.log('Petición a la API de productos realizada');
 
         if (!res.ok) throw new Error('Error al obtener productos');
 
         const productos = await res.json();
-        console.log('Productos obtenidos:', productos);
 
         const teclados = productos.filter(p => p.type === 'teclado');
-        console.log('Teclados filtrados:', teclados);
 
         teclados.forEach(teclado => {
             const col = document.createElement('div');
             col.className = 'col-md-4';
-            console.log('Teclado procesado:', teclado);
             col.innerHTML = `
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
                     <img src="${teclado.imageUrl}" class="card-img-top img-fluid object-fit-cover h-100" alt="${teclado.name}" />
@@ -597,7 +581,6 @@ async function mostrarTeclados() {
         });
 
     } catch (err) {
-        console.log('Error al cargar teclados:', err);
         mostrarAlerta('Error al cargar teclados', 'danger');
     } finally {
         spinner.style.display = 'none';
@@ -605,7 +588,6 @@ async function mostrarTeclados() {
 }
 
 async function mostrarMouses() {
-    console.log('Cargando mouses...');
 
     const contenedor = document.querySelector('#seccion-mouses .row');
     const spinner = document.getElementById('spinner');
@@ -618,15 +600,12 @@ async function mostrarMouses() {
 
     try {
         const res = await fetch('http://localhost:3000/api/productos');
-        console.log('Petición a la API de productos realizada');
 
         if (!res.ok) throw new Error('Error al obtener productos');
 
         const productos = await res.json();
-        console.log('Productos obtenidos:', productos);
 
         const mouses = productos.filter(p => p.type === 'mouse');
-        console.log('Mouses filtrados:', mouses);
 
         mouses.forEach(mouse => {
             const col = document.createElement('div');
@@ -868,7 +847,6 @@ function mostrarSeccionMouses() {
     mostrarMousesPaginacion();
 }
 
-// console.log(carritoTest)
 
 function eliminarDelLocalStorage(clave) {
     localStorage.removeItem(clave);
@@ -876,7 +854,6 @@ function eliminarDelLocalStorage(clave) {
 
 
 async function mostrarProductos() {
-    console.log('Cargando productos...');
 
     const tbody = document.getElementById('tabla-productos');
     const spinner = document.getElementById('spinner');
@@ -891,7 +868,6 @@ async function mostrarProductos() {
         if (!res.ok) throw new Error('Error al obtener productos');
 
         const productos = await res.json();
-        console.log('Productos obtenidos:', productos);
 
         productos.forEach(producto => {
             const fila = document.createElement('tr');
@@ -943,8 +919,6 @@ async function toggleProductoEstado(id, nuevoEstado) {
             headers: headers,
             body: JSON.stringify({ active: nuevoEstado })
         });
-
-        console.log(res)
 
         if (!res.ok) throw new Error('Error al actualizar el estado del producto');
 
@@ -1061,7 +1035,6 @@ async function modificarProducto(id) {
 
     try {
         const token = localStorage.getItem('adminToken');
-        console.log('Token de administrador:', token);
         const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -1084,8 +1057,6 @@ function cargarProductoParaModificar() {
         return;
     }
     const p = JSON.parse(productoJSON);
-
-    console.log(p)
 
     // Campo oculto para el ID
     let inputId = document.getElementById('productoId');
@@ -1158,8 +1129,6 @@ async function guardarCambiosProducto(e) {
         stock,
         active
     };
-
-    console.log(payload)
 
     try {
         const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
@@ -1261,11 +1230,9 @@ async function handleSubmit(e) {
 
     };
 
-    console.log('Payload de altaProducto:', producto)
 
     try {
         const creado = await altaProducto(producto, token);
-        console.log(creado)
         mostrarAlerta(`Producto "${creado.name}" creado con ID ${creado.id}`, 'success');
         setTimeout(() => {
             window.location.href = 'dashboard.html'; // redirigir al dashboard
@@ -1273,8 +1240,6 @@ async function handleSubmit(e) {
         // Limpiar el formulario
         document.querySelector('form').reset();
     } catch (err) {
-        console.log(creado)
-        console.error(err);
         mostrarAlerta(`No se pudo crear el producto: ${err.message}`, 'danger');
     }
 }
