@@ -38,7 +38,8 @@ db.Venta   = Venta;
 db.Administrator = Administrator;
 
 // 5) Definir asociaciones (osea las foreign keys)
-Product.hasMany(Venta, { foreignKey: 'id_producto', sourceKey: 'id' });
-Venta.belongsTo(Product, { foreignKey: 'id_producto', targetKey: 'id', as: 'producto' });
+Product.hasMany(Venta, { foreignKey: 'id_venta', sourceKey: 'id_product' });
+Venta.belongsTo(Product, { foreignKey: 'id_venta', targetKey: 'id_product', as: 'producto' });
+
 
 module.exports = db;
