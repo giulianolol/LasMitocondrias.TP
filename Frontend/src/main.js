@@ -40,12 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
             form.addEventListener('submit', guardarCambiosProducto);
         }
         const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
+        const id = params.get('id_product');
         const productoJSON = localStorage.getItem('productoParaModificar');
         if (!productoJSON) return console.warn('No hay producto para modificar en localStorage');
 
         const producto = JSON.parse(productoJSON);
-        if (String(producto.id) !== id) {
+        if (String(producto.id_product) !== id) {
             console.warn('El ID de la URL y el de localStorage no coinciden');
             return;
         }
@@ -64,6 +64,21 @@ async function handleAdminLogin(event) {
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
+    // const errorDiv = document.getElementById("loginError");
+
+    // Limpiar errores previos
+    // if (errorDiv) {
+    //     errorDiv.style.display = "none";
+    //     errorDiv.textContent = "";
+    // }
+
+    //DESCOMENTAR PARA DEBUGEAR EL FRONTEND - YA FUNCIONA (24/6)
+    // console.log("=== DEBUG FRONTEND ===");
+    // console.log("Email:", email);
+    // console.log("ESTA ES LA PASS: " + password)
+    // console.log("Password:", password ? "***" : "vacío");
+
+
     try {
         console.log("Enviando request a:", "http://localhost:3000/api/administradores/login");
 
@@ -102,6 +117,15 @@ async function handleAdminLogin(event) {
 
     } catch (err) {
         console.error("Login error:", err);
+
+        // Mostrar error solo si existe el elemento
+        // if (errorDiv) {
+        //     errorDiv.textContent = err.message;
+        //     errorDiv.style.display = "block";
+        // } else {
+        //     // Fallback si no existe el div de error
+        //     alert("Error: " + err.message);
+        // }
     }
 }
 
@@ -918,8 +942,8 @@ async function mostrarProductos() {
                                onchange="toggleProductoEstado(${producto.id}, this.checked, this)"
                                title="${producto.active ? 'Desactivar producto' : 'Activar producto'}">
                     </div>
-                    <a class="btn btn-sm btn-warning me-1" onclick="modificarProducto(${producto.id})">Modificar</a>
-                    <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id})">Eliminar</button>
+                    <a class="btn btn-sm btn-warning me-1" onclick="modificarProducto(${producto.id_product})">Modificar</a>
+                    <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id_product})">Eliminar</button>
                 </td>
             `;
 
@@ -1153,13 +1177,18 @@ function cargarProductoParaModificar() {
 async function guardarCambiosProducto(e) {
     e.preventDefault(); // evita que recargue la página
 
-    const id = document.getElementById('productoId').value;
+    const productoAModificar = localStorage.getItem('productoParaModificar')
+
+    const { id_product } = JSON.parse(productoAModificar)
+    
     const name = document.getElementById('nombre').value;
     const description = document.getElementById('descripcion').value;
     const price = document.getElementById('precio').value;
     const stock = document.getElementById('stock').value;
     const active = document.getElementById('activo').value === 'true';
     const token = localStorage.getItem('adminToken');
+
+    console.log(id_product)
 
     const payload = {
         name,
@@ -1172,7 +1201,7 @@ async function guardarCambiosProducto(e) {
     console.log(payload)
 
     try {
-        const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
+        const res = await fetch(`http://localhost:3000/api/productos/${id_product}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
