@@ -1362,7 +1362,7 @@ async function handleSubmit(e) {
     try {
         const creado = await altaProducto(producto, token);
         console.log(creado)
-        mostrarAlerta(`Producto "${creado.name}" creado con ID ${creado.id}`, 'success');
+        mostrarAlerta(`Producto "${creado.name}" creado con ID ${creado.id_product}`, 'success');
         setTimeout(() => {
             window.location.href = 'dashboard.html'; // redirigir al dashboard
         }, 2000);
