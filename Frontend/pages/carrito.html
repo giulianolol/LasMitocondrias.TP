@@ -96,8 +96,17 @@
                                         <strong id="total-carrito" class="text-primary fs-5">$0.00</strong>
                                     </div>
                                 </div>
+
+
+
                                 <div class="col-md-4">
                                     <div class="d-grid gap-2">
+                                          <label for="medio-pago" class="me-3 mb-0">Medio de pago:</label>
+                                            <select class="form-select w-auto" id="medio-pago">
+                                                <option value="efectivo" selected>Efectivo</option>
+                                                <option value="debito">Débito</option>
+                                                <option value="credito">Crédito</option>
+                                            </select>
                                         <button id="btn-proceder-compra" class="btn btn-success btn-lg" onclick="procederCompra()">
                                             <i class="fas fa-credit-card me-2"></i>Finalizar Compra
                                         </button>
