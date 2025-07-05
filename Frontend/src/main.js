@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderTicketPage();
     }
 
-
     //Si estamos en modificaciones.html leemos el producto y podemos llenar el formulad
     if (location.pathname.endsWith('modificaciones.html')) {
         cargarProductoParaModificar();
@@ -52,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
             form.addEventListener('submit', guardarCambiosProducto);
         }
         const params = new URLSearchParams(window.location.search);
+        console.log(params)
         const id = params.get('id_product');
         const productoJSON = localStorage.getItem('productoParaModificar');
         if (!productoJSON) return console.warn('No hay producto para modificar en localStorage');
@@ -284,68 +284,70 @@ function vaciarCarritoConfirmado() {
 }
 
 async function procederCompra() {
-    if (carrito.length === 0) {
-        mostrarAlerta('Tu carrito está vacío', 'warning');
-        return;
+  if (carrito.length === 0) {
+    mostrarAlerta('Tu carrito está vacío', 'warning');
+    return;
+  }
+
+  const nombreUsuario = localStorage.getItem('nombreCliente');
+  const medioPago     = document.getElementById('medio-pago').value;
+  const totalCompra   = calcularTotalCarrito();
+
+  // 1) Construir el array de productos con los campos correctos
+  const productosPayload = carrito.map(item => ({
+    id_product: item.id_product,                              // la clave real de tu objeto
+    cantidad:   item.cantidad,                                // la clave real
+    subtotal:   parseFloat(item.price) * item.cantidad        // convierte price (string) a número
+  }));
+
+  try {
+    // 2) Enviar la venta al backend
+    const res = await fetch('http://localhost:3000/api/ventas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre_usuario: nombreUsuario,
+        medio_pago:     medioPago,
+        monto:          totalCompra,
+        productos:      productosPayload
+      })
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      console.error('Error al registrar venta:', error);
+      mostrarAlerta('Error al registrar la venta', 'danger');
+      return;
     }
 
-    const nombreUsuario = localStorage.getItem('nombreCliente');
-    const medioPago = document.getElementById('medio-pago').value;
-    const totalCompra = calcularTotalCarrito();
+    const venta = await res.json();
+    console.log('Venta registrada:', venta);
 
-    try {
-        // Crear una venta
-        const res = await fetch('http://localhost:3000/api/ventas', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-            nombre_usuario: nombreUsuario,
-            medio_pago:     medioPago,
-            monto:          totalCompra,
-            productos: carrito.map(item => ({
-            id_product: item.id,
-            cantidad:   item.quantity,
-            subtotal:   item.price * item.quantity
-  }))
-})
+    // 3) Guardar info para el ticket y limpiar carrito
+    const compra = {
+      productos: [...carrito],
+      total:     totalCompra,
+      fecha:     obtenerFecha(),
+      cliente:   nombreUsuario,
+      medioPago: medioPago
+    };
+    localStorage.setItem('ultimaCompra', JSON.stringify(compra));
 
-        });
+    carrito = [];
+    guardarCarrito();
+    actualizarContadorCarrito();
 
-        if (!res.ok) {
-            const error = await res.json();
-            console.error('Error al registrar venta:', error);
-            mostrarAlerta('Error al registrar la venta', 'danger');
-            return;
-        }
+    mostrarAlerta('¡Compra realizada con éxito! Redirigiendo al ticket...', 'success');
+    setTimeout(() => {
+      window.location.href = 'ticket.html';
+    }, 2000);
 
-        const venta = await res.json();
-        console.log('Venta registrada:', venta);
-
-        // Guardar info para el ticket
-        const compra = {
-            productos: [...carrito],
-            total: calcularTotalCarrito(),
-            fecha: obtenerFecha(),
-            cliente: nombreUsuario,
-            medioPago: medioPago
-        };
-
-        localStorage.setItem('ultimaCompra', JSON.stringify(compra));
-
-        carrito = [];
-        guardarCarrito();
-        actualizarContadorCarrito();
-
-        mostrarAlerta('¡Compra realizada con éxito! Redirigiendo al ticket...', 'success');
-        setTimeout(() => {
-            window.location.href = 'ticket.html';
-        }, 2000);
-
-    } catch (err) {
-        console.error('Error al procesar la compra:', err);
-        mostrarAlerta('Ocurrió un error inesperado', 'danger');
-    }
+  } catch (err) {
+    console.error('Error al procesar la compra:', err);
+    mostrarAlerta('Ocurrió un error inesperado', 'danger');
+  }
 }
+
 
 
 function actualizarContadorCarrito() {// Actualizar contador en navbar si existe
