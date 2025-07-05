@@ -289,14 +289,26 @@ async function procederCompra() {
         return;
     }
 
-    const nombreUsuario = localStorage.getItem('nombreCliente') || 'Cliente';
+    const nombreUsuario = localStorage.getItem('nombreCliente');
+    const medioPago = document.getElementById('medio-pago').value;
+    const totalCompra = calcularTotalCarrito();
 
     try {
         // Crear una venta
         const res = await fetch('http://localhost:3000/api/ventas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre_usuario: nombreUsuario }) 
+            body: JSON.stringify({
+            nombre_usuario: nombreUsuario,
+            medio_pago:     medioPago,
+            monto:          totalCompra,
+            productos: carrito.map(item => ({
+            id_product: item.id,
+            cantidad:   item.quantity,
+            subtotal:   item.price * item.quantity
+  }))
+})
+
         });
 
         if (!res.ok) {
@@ -314,7 +326,8 @@ async function procederCompra() {
             productos: [...carrito],
             total: calcularTotalCarrito(),
             fecha: obtenerFecha(),
-            cliente: nombreUsuario
+            cliente: nombreUsuario,
+            medioPago: medioPago
         };
 
         localStorage.setItem('ultimaCompra', JSON.stringify(compra));
