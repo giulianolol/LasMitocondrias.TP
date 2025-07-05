@@ -2,75 +2,71 @@ const db = require('../models');
 const { Sequelize } = db;
 const Venta   = db.Venta;
 const Product = db.Product;
-const Ticket  = db.Ticket;
-const Pago    = db.Pago;
 
 
 exports.createVenta = async (req, res) => {
   const t = await db.sequelize.transaction();
+
   try {
     const { nombre_usuario, medio_pago, monto, productos } = req.body;
-
-    console.log('Productos recibidos:', productos);
 
     if (!nombre_usuario || !medio_pago || monto == null || !Array.isArray(productos) || productos.length === 0) {
       return res.status(400).json({ error: 'Faltan datos: nombre_usuario, medio_pago, monto o productos' });
     }
 
-    // 1) Generar id_venta único
+    // Crear ID único para la venta
     let id_venta;
-    do {
-      const now = new Date();
+    let ventaExiste = true;
+    while (ventaExiste) {
+      const ahora = new Date();
       id_venta = parseInt(
-        now.getDate().toString().padStart(2,'0') +
-        now.getHours().toString().padStart(2,'0') +
-        now.getMinutes().toString().padStart(2,'0') +
-        now.getSeconds().toString().padStart(2,'0') +
-        Math.floor(Math.random()*100).toString().padStart(2,'0')
+        ahora.getDate().toString().padStart(2, '0') +
+        ahora.getHours().toString().padStart(2, '0') +
+        ahora.getMinutes().toString().padStart(2, '0') +
+        ahora.getSeconds().toString().padStart(2, '0') +
+        Math.floor(Math.random() * 100).toString().padStart(2, '0')
       );
-    } while (await Venta.findOne({ where:{ id_venta }, transaction: t }));
+      const existeVenta = await db.Venta.findOne({ where: { id_venta } });
+      if (!existeVenta) ventaExiste = false;
+    }
 
-    // 2) Crear la venta
-    const nuevaVenta = await Venta.create({
+    // Crear la venta
+    const nuevaVenta = await db.Venta.create({
       id_venta,
       nombre_usuario
     }, { transaction: t });
 
-
-
-    // 3) Crear un ticket por cada producto
-    //    (la tabla Ticket tiene columnas: id_venta, id_product, created_at, user_name)
+    // Crear tickets por cada producto
     for (const item of productos) {
-      await Ticket.create({
-        id_venta:   id_venta,
-        id_product: item.id_product,
-        user_name:  nombre_usuario
-        // created_at toma default NOW
+      const id_product = item.id_product ?? item.id;
+      if (!id_product) throw new Error('Falta id_product en uno de los items');
+
+      await db.Ticket.create({
+        id_venta,
+        id_product,
+        user_name: nombre_usuario
       }, { transaction: t });
     }
 
-    // 4) Mapear medio_pago → id_tipopago
-    const tipoMap = { efectivo:1, debito:2, credito:3 };
-    const id_tipopago = tipoMap[medio_pago.toLowerCase()];
-    if (!id_tipopago) throw new Error('medio_pago inválido');
-
-    // 5) Crear el pago
-    await Pago.create({
+    // Crear el pago
+    const id_tipopago = medio_pago === 'efectivo' ? 1 : medio_pago === 'debito' ? 2 : 3;
+    await db.Pago.create({
       id_venta,
+      fecha: new Date(),
       monto,
       id_tipopago
-      // fecha toma default NOW
     }, { transaction: t });
 
     await t.commit();
+    return res.status(201).json(nuevaVenta);
 
-    return res.status(201).json({ venta: nuevaVenta });
   } catch (err) {
-    await t.rollback();
     console.error('Error en createVenta:', err);
-    return res.status(500).json({ error: err.message });
+    await t.rollback();
+    return res.status(500).json({ error: err.message || 'Error al crear venta' });
   }
 };
+
 
 
 
