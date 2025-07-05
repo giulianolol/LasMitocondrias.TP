@@ -948,6 +948,10 @@ function eliminarDelLocalStorage(clave) {
 }
 
 
+let productosGlobal = []; // almacena todos los productos
+let paginaActual2 = 1;
+const productosPorPagina = 10;
+
 async function mostrarProductos() {
     console.log('Cargando productos...');
 
@@ -963,31 +967,10 @@ async function mostrarProductos() {
         const res = await fetch('http://localhost:3000/api/productos');
         if (!res.ok) throw new Error('Error al obtener productos');
 
-        const productos = await res.json();
-        console.log('Productos obtenidos:', productos);
+        productosGlobal = await res.json(); // guardamos todos
+        console.log('Productos obtenidos:', productosGlobal);
 
-        productos.forEach(producto => {
-            const fila = document.createElement('tr');
-
-            fila.innerHTML = `
-                <td>${producto.id_product}</td>
-                <td>${producto.name}</td>
-                <td>$${producto.price}</td>
-                <td>${producto.active ? 'Sí' : 'No'}</td>
-                <td>
-                    <div class="form-check form-switch d-inline-block me-2">
-                        <input class="form-check-input" type="checkbox" 
-                               ${producto.active ? 'checked' : ''} 
-                               onchange="toggleProductoEstado(${producto.id_product}, this.checked, this)"
-                               title="${producto.active ? 'Desactivar producto' : 'Activar producto'}">
-                    </div>
-                    <a class="btn btn-sm btn-warning me-1" onclick="modificarProducto(${producto.id_product})">Modificar</a>
-                    <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id_product})">Eliminar</button>
-                </td>
-            `;
-
-            tbody.appendChild(fila);
-        });
+        mostrarPagina(paginaActual2); // mostrar solo la página actual
 
     } catch (err) {
         console.error(err);
@@ -996,6 +979,62 @@ async function mostrarProductos() {
         if (spinner) spinner.style.display = 'none';
     }
 }
+
+function mostrarPagina(pagina) {
+    const tbody = document.getElementById('tabla-productos');
+    tbody.innerHTML = '';
+
+    const inicio = (pagina - 1) * productosPorPagina;
+    const fin = inicio + productosPorPagina;
+    const productosPagina = productosGlobal.slice(inicio, fin);
+
+    productosPagina.forEach(producto => {
+        const fila = document.createElement('tr');
+
+        fila.innerHTML = `
+            <td>${producto.id_product}</td>
+            <td>${producto.name}</td>
+            <td>$${producto.price}</td>
+            <td>${producto.active ? 'Sí' : 'No'}</td>
+            <td>
+                <div class="form-check form-switch d-inline-block me-2">
+                    <input class="form-check-input" type="checkbox" 
+                        ${producto.active ? 'checked' : ''} 
+                        onchange="toggleProductoEstado(${producto.id_product}, this.checked, this)"
+                        title="${producto.active ? 'Desactivar producto' : 'Activar producto'}">
+                </div>
+                <a class="btn btn-sm btn-warning me-1" onclick="modificarProducto(${producto.id_product})">Modificar</a>
+                <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id_product})">Eliminar</button>
+            </td>
+        `;
+
+        tbody.appendChild(fila);
+    });
+
+    // actualizar número de página
+    document.getElementById('paginaActual').textContent = `Página ${paginaActual2}`;
+
+    // desactivar botones si corresponde
+    document.getElementById('btnAnterior').disabled = paginaActual2 === 1;
+    document.getElementById('btnSiguiente').disabled = fin >= productosGlobal.length;
+}
+
+// eventos de los botones
+document.getElementById('btnAnterior').addEventListener('click', () => {
+    if (paginaActual2 > 1) {
+        paginaActual2--;
+        mostrarPagina(paginaActual2);
+    }
+});
+
+document.getElementById('btnSiguiente').addEventListener('click', () => {
+    const maxPaginas = Math.ceil(productosGlobal.length / productosPorPagina);
+    if (paginaActual2 < maxPaginas) {
+        paginaActual2++;
+        mostrarPagina(paginaActual2);
+    }
+});
+
 // Función para manejar el cambio de estado del producto - MOMENTANEA
 async function toggleProductoEstado(id, nuevoEstado, switchElement) {
     try {
