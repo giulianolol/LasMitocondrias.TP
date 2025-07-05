@@ -80,12 +80,12 @@ exports.createProducto = async (req, res) => {
  * Body: { name, type, price, imageUrl, active (opcional) }
  */
 exports.updateProducto = async (req, res) => {
-  console.log('Actualizando producto con ID:');
   try {
-    // Desestructura TODO lo que viene en el body
+    console.log(' BODY:', req.body);
+    console.log(' PARAMS ID:', req.params.id);
+
     const { name, description, price, stock, type, active } = req.body;
 
-    // Construye un objeto solo con los campos que no sean undefined
     const updates = {};
     if (name        !== undefined) updates.name        = name;
     if (description !== undefined) updates.description = description;
@@ -94,23 +94,25 @@ exports.updateProducto = async (req, res) => {
     if (type        !== undefined) updates.type        = type;
     if (active      !== undefined) updates.active      = active;
 
+    console.log(' Updates a aplicar:', updates);
+
     const [rowsUpdated] = await Product.update(
       updates,
-      { where: { id: req.params.id }, returning: true }
+      { where: { id: Number(req.params.id) }, returning: true }
     );
 
     if (rowsUpdated === 0) {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
 
-    // Devolver el producto actualizado si querés
     const productoActualizado = await Product.findByPk(req.params.id);
     res.json(productoActualizado);
   } catch (error) {
-    console.error('Error en updateProducto:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    console.error(' Error en updateProducto:', error);
+    res.status(500).json({ message: 'Error interno del servidor', detalle: error.message });
   }
 };
+
 
 //PATCH /api/productos/:id/toggle
 //Invierte el valor booleano de 'active'
