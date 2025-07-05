@@ -96,15 +96,17 @@ exports.updateProducto = async (req, res) => {
 
     console.log(' Updates a aplicar:', updates);
 
+    // CAMBIO AQUÍ: usar id_product en lugar de id
     const [rowsUpdated] = await Product.update(
       updates,
-      { where: { id: Number(req.params.id) }, returning: true }
+      { where: { id_product: Number(req.params.id) }, returning: true }
     );
 
     if (rowsUpdated === 0) {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
 
+    // CAMBIO AQUÍ: usar id_product también en findByPk
     const productoActualizado = await Product.findByPk(req.params.id);
     res.json(productoActualizado);
   } catch (error) {
