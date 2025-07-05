@@ -3,15 +3,14 @@
 const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config();
 const path = require('path');
-const administrator = require('./administrator');
 
-// 1) Inicializar Sequelize
+// Inicializar Sequelize
 const sequelize = new Sequelize(process.env.SUPABASE_DB_URL, {
   dialect: 'postgres',
   logging: false,
 });
 
-// 2) Verificar la conexión
+// Verificar la conexión
 (async () => {
   try {
     await sequelize.authenticate();
@@ -21,25 +20,35 @@ const sequelize = new Sequelize(process.env.SUPABASE_DB_URL, {
   }
 })();
 
-// 3) Importar los modelos (las funciones de product.js y ventas.js)
-const Product = require('./product')(sequelize, DataTypes)
-const Administrator = require(path.join(__dirname, 'administrator'))(sequelize, DataTypes)
-const Venta   = require(path.join(__dirname, 'ventas'))(sequelize, DataTypes) //VERIFIAR FUNCIONAMIENTO DE VENTA, OJO CON RUTA DE DIRECTORIO
+// Importar los modelos
+const Product       = require(path.join(__dirname, 'product'))(sequelize, DataTypes);
+const Administrator = require(path.join(__dirname, 'administrator'))(sequelize, DataTypes);
+const Venta         = require(path.join(__dirname, 'venta'))(sequelize, DataTypes);
+const Ticket        = require(path.join(__dirname, 'ticket'))(sequelize, DataTypes);
+const Pago          = require(path.join(__dirname, 'pago'))(sequelize, DataTypes);
 
-console.log('db.Product:', Product);
+//  Registrar modelos en el objeto db
+const db = {
+  Sequelize,
+  sequelize,
+  Product,
+  Administrator,
+  Venta,
+  Ticket,
+  Pago,
+};
 
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+//  Definir asociaciones
+// Un Producto puede estar en muchas Ventas (si manejas id_product en Venta)
+Product.hasMany(Venta, { foreignKey: 'id_product', sourceKey: 'id_product' });
+Venta.belongsTo(Product, { foreignKey: 'id_product', targetKey: 'id_product', as: 'producto' });
 
-// 4) Guardar los modelos en db
-db.Product = Product;
-db.Venta   = Venta;
-db.Administrator = Administrator;
+// Una Venta puede tener muchos Tickets (uno por producto en la venta)
+Venta.hasMany(Ticket, { foreignKey: 'id_venta', sourceKey: 'id_venta' });
+Ticket.belongsTo(Venta, { foreignKey: 'id_venta', targetKey: 'id_venta' });
 
-// 5) Definir asociaciones (osea las foreign keys)
-Product.hasMany(Venta, { foreignKey: 'id_venta', sourceKey: 'id_product' });
-Venta.belongsTo(Product, { foreignKey: 'id_venta', targetKey: 'id_product', as: 'producto' });
-
+// Una Venta tiene un Pago
+Venta.hasOne(Pago, { foreignKey: 'id_venta', sourceKey: 'id_venta' });
+Pago.belongsTo(Venta, { foreignKey: 'id_venta', targetKey: 'id_venta' });
 
 module.exports = db;
