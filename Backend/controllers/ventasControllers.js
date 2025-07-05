@@ -1,61 +1,79 @@
 const db = require('../models');
-const Venta = db.Venta;
+const { Sequelize } = db;
+const Venta   = db.Venta;
 const Product = db.Product;
+const Ticket  = db.Ticket;
+const Pago    = db.Pago;
 
-/**
- * POST /api/ventas
- * Recibe en el body:
- *   {
- *     "id_producto": 123,
- *     "nombre_usuario": "Juan Pérez"
- *   }
- * (fecha_hora_venta se toma automáticamente con defaultValue NOW)
- */
 
 exports.createVenta = async (req, res) => {
-  console.log("Estoy acá")
-
+  const t = await db.sequelize.transaction();
   try {
-    const { nombre_usuario } = req.body;
+    const { nombre_usuario, medio_pago, monto, productos } = req.body;
 
-    if (!nombre_usuario) {
-      return res.status(400).json({ error: 'Falta el nombre del usuario' });
+    console.log('Productos recibidos:', productos);
+
+    if (!nombre_usuario || !medio_pago || monto == null || !Array.isArray(productos) || productos.length === 0) {
+      return res.status(400).json({ error: 'Faltan datos: nombre_usuario, medio_pago, monto o productos' });
     }
 
-    // Generar id_venta único y corto
+    // 1) Generar id_venta único
     let id_venta;
-    let ventaExiste = true;
-    
-    // Asegurar que el ID no exista ya
-    while (ventaExiste) {
-      const ahora = new Date();
+    do {
+      const now = new Date();
       id_venta = parseInt(
-          ahora.getDate().toString().padStart(2, '0') +
-          ahora.getHours().toString().padStart(2, '0') +
-          ahora.getMinutes().toString().padStart(2, '0') +
-          ahora.getSeconds().toString().padStart(2, '0') +
-          Math.floor(Math.random() * 100).toString().padStart(2, '0')
+        now.getDate().toString().padStart(2,'0') +
+        now.getHours().toString().padStart(2,'0') +
+        now.getMinutes().toString().padStart(2,'0') +
+        now.getSeconds().toString().padStart(2,'0') +
+        Math.floor(Math.random()*100).toString().padStart(2,'0')
       );
-      
-      // Verificar si ya existe
-      const existeVenta = await Venta.findOne({ where: { id_venta } });
-      if (!existeVenta) {
-        ventaExiste = false;
-      }
-    }
+    } while (await Venta.findOne({ where:{ id_venta }, transaction: t }));
 
-    // Crear la venta
+    // 2) Crear la venta
     const nuevaVenta = await Venta.create({
       id_venta,
-      nombre_usuario,
-    });
+      nombre_usuario
+    }, { transaction: t });
 
-    return res.status(201).json(nuevaVenta);
+
+
+    // 3) Crear un ticket por cada producto
+    //    (la tabla Ticket tiene columnas: id_venta, id_product, created_at, user_name)
+    for (const item of productos) {
+      await Ticket.create({
+        id_venta:   id_venta,
+        id_product: item.id_product,
+        user_name:  nombre_usuario
+        // created_at toma default NOW
+      }, { transaction: t });
+    }
+
+    // 4) Mapear medio_pago → id_tipopago
+    const tipoMap = { efectivo:1, debito:2, credito:3 };
+    const id_tipopago = tipoMap[medio_pago.toLowerCase()];
+    if (!id_tipopago) throw new Error('medio_pago inválido');
+
+    // 5) Crear el pago
+    await Pago.create({
+      id_venta,
+      monto,
+      id_tipopago
+      // fecha toma default NOW
+    }, { transaction: t });
+
+    await t.commit();
+
+    return res.status(201).json({ venta: nuevaVenta });
   } catch (err) {
+    await t.rollback();
     console.error('Error en createVenta:', err);
-    return res.status(500).json({ error: err.message || 'Error al crear venta' });
+    return res.status(500).json({ error: err.message });
   }
 };
+
+
+
 
 /**
  * GET /api/ventas
