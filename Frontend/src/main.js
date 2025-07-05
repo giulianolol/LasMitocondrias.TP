@@ -960,7 +960,7 @@ async function mostrarProductos() {
                     <div class="form-check form-switch d-inline-block me-2">
                         <input class="form-check-input" type="checkbox" 
                                ${producto.active ? 'checked' : ''} 
-                               onchange="toggleProductoEstado(${producto.id}, this.checked, this)"
+                               onchange="toggleProductoEstado(${producto.id_product}, this.checked, this)"
                                title="${producto.active ? 'Desactivar producto' : 'Activar producto'}">
                     </div>
                     <a class="btn btn-sm btn-warning me-1" onclick="modificarProducto(${producto.id_product})">Modificar</a>
@@ -979,7 +979,7 @@ async function mostrarProductos() {
     }
 }
 // Función para manejar el cambio de estado del producto - MOMENTANEA
-async function toggleProductoEstado(id, nuevoEstado) {
+async function toggleProductoEstado(id, nuevoEstado, switchElement) {
     try {
         // Obtenemos
         const token = localStorage.getItem('adminToken') || sessionStorage.getItem('token');
@@ -999,17 +999,17 @@ async function toggleProductoEstado(id, nuevoEstado) {
             body: JSON.stringify({ active: nuevoEstado })
         });
 
-        console.log(res)
+        console.log(res);
 
         if (!res.ok) throw new Error('Error al actualizar el estado del producto');
 
         // Actualizar la columna de estado en la tabla
-        const fila = event.target.closest('tr');
+        const fila = switchElement.closest('tr');
         const columnaEstado = fila.children[3];
         columnaEstado.textContent = nuevoEstado ? 'Sí' : 'No';
 
-        // Actualizar el tooltip del switch, al final funcionó :)
-        event.target.title = nuevoEstado ? 'Desactivar producto' : 'Activar producto';
+        // Actualizar el tooltip del switch
+        switchElement.title = nuevoEstado ? 'Desactivar producto' : 'Activar producto';
 
         mostrarAlerta(`Producto ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`, 'success');
 
@@ -1018,7 +1018,7 @@ async function toggleProductoEstado(id, nuevoEstado) {
         mostrarAlerta('Error al cambiar el estado del producto', 'danger');
 
         // Revertir el switch si hubo error
-        event.target.checked = !nuevoEstado;
+        switchElement.checked = !nuevoEstado;
     }
 }
 
@@ -1201,16 +1201,21 @@ function cargarProductoParaModificar() {
 }
 
 async function guardarCambiosProducto(e) {
-    e.preventDefault(); // evita que recargue la página
+    e.preventDefault();
 
-    console.log("ESTOY EN guardar CAMBIOS")
+    console.log("ESTOY EN guardar CAMBIOS");
 
-    const productoAModificar = localStorage.getItem('productoParaModificar')
-
-    const { id_product } = JSON.parse(productoAModificar)
+    const productoAModificar = localStorage.getItem('productoParaModificar');
     
-    const name = document.getElementById('nombre').value;
-    const description = document.getElementById('descripcion').value;
+    if (!productoAModificar) {
+        mostrarAlerta('No se encontró el producto a modificar', 'danger');
+        return;
+    }
+
+    const { id_product } = JSON.parse(productoAModificar);
+    
+    const name = document.getElementById('nombre').value.trim();
+    const description = document.getElementById('descripcion').value.trim();
     const price = document.getElementById('precio').value;
     const stock = document.getElementById('stock').value;
     const active = document.getElementById('activo').value === 'true';
@@ -1218,20 +1223,35 @@ async function guardarCambiosProducto(e) {
     const tipoSwitch = document.getElementById('tipoSwitch');
     const type = tipoSwitch.checked ? 'teclado' : 'mouse';
 
+    // Validaciones
+    if (!name || name.length === 0) {
+        mostrarAlerta('El nombre del producto es requerido', 'danger');
+        return;
+    }
     
+    if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+        mostrarAlerta('El precio debe ser un número válido mayor a 0', 'danger');
+        return;
+    }
+    
+    if (!stock || isNaN(parseInt(stock)) || parseInt(stock) < 0) {
+        mostrarAlerta('El stock debe ser un número válido mayor o igual a 0', 'danger');
+        return;
+    }
+
     const payload = {
         name,
         description,
         price: parseFloat(price),
         stock: parseInt(stock),
         active,
-        type: document.getElementById('tipoSwitch').checked ? 'teclado' : 'mouse'
+        type
     };
     
-    
     try {
-        console.log(payload)
-        console.log(id_product)
+        console.log('Payload a enviar:', payload);
+        console.log('ID del producto:', id_product);
+        
         const res = await fetch(`http://localhost:3000/api/productos/${id_product}`, {
             method: 'PUT',
             headers: {
@@ -1243,8 +1263,12 @@ async function guardarCambiosProducto(e) {
 
         if (!res.ok) {
             const error = await res.json();
+            console.error('Error del servidor:', error);
             throw new Error(error.message || 'Error al actualizar el producto');
         }
+        
+        const result = await res.json();
+        console.log('Respuesta del servidor:', result);
         
         mostrarAlerta('Producto actualizado con éxito', 'success');
 
@@ -1252,7 +1276,7 @@ async function guardarCambiosProducto(e) {
         localStorage.removeItem('productoParaModificar');
         window.location.href = 'dashboard.html';
     } catch (err) {
-        console.error(err);
+        console.error('Error completo:', err);
         mostrarAlerta('Error al guardar cambios: ' + err.message, 'danger');
     }
 }
