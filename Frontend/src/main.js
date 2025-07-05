@@ -1,4 +1,13 @@
 let isTestLogin = false;
+let isEditMode = false;
+
+function initAltaFormulario() {
+    // Solo aplicar a formularios que NO sean de modificación
+    const form = document.querySelector('form:not(#formModificar)');
+    if (form) {
+        form.addEventListener('submit', handleSubmit);
+    }
+}
 
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
@@ -14,11 +23,29 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarContadorCarrito();
     mostrarProductos();
     inicializarTema();
-    initAltaFormulario();
+    // initAltaFormulario();
 
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', handleSubmit);
+    const formModificar = document.getElementById('formModificar');
+    const formAlta = document.getElementById('formAlta'); // Asumiendo que tu formulario de alta tiene este ID
+    
+    if (formModificar) {
+        const productoParaModificar = localStorage.getItem('productoParaModificar');
+        if (productoParaModificar) {
+            isEditMode = true;
+            cargarProductoParaModificar();
+        }
+        
+        formModificar.addEventListener('submit', (e) => {
+            if (isEditMode) {
+                guardarCambiosProducto(e);
+            } else {
+                handleSubmit(e);
+            }
+        });
+    }
+
+    if (formAlta && !isEditMode) {
+    formAlta.addEventListener('submit', handleSubmit);
     }
 
     const testButton = document.getElementById("testButton");
@@ -40,27 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (document.getElementById('ticket-body')) {
         renderTicketPage();
-    }
-
-    //Si estamos en modificaciones.html leemos el producto y podemos llenar el formulad
-    if (location.pathname.endsWith('modificaciones.html')) {
-        cargarProductoParaModificar();
-
-        const form = document.getElementById('formModificar');
-        if (form) {
-            form.addEventListener('submit', guardarCambiosProducto);
-        }
-        const params = new URLSearchParams(window.location.search);
-        console.log(params)
-        const id = params.get('id_product');
-        const productoJSON = localStorage.getItem('productoParaModificar');
-        if (!productoJSON) return console.warn('No hay producto para modificar en localStorage');
-
-        const producto = JSON.parse(productoJSON);
-        if (String(producto.id_product) !== id) {
-            console.warn('El ID de la URL y el de localStorage no coinciden');
-            return;
-        }
     }
 
     document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
@@ -1167,8 +1173,13 @@ function cargarProductoParaModificar() {
     if (activo) activo.value = String(p.active);
 
     // Tipo
-    const tipo = document.getElementById('type');
-    if (tipo) tipo.value = p.type || '';
+    const tipoSwitch = document.getElementById('tipoSwitch');
+    if (tipoSwitch) {
+        tipoSwitch.checked = p.type === 'teclado'; // true si es teclado, false si no
+    }
+
+    // const previewExistente = fileInput.parentNode.querySelector('img');
+    // if (previewExistente) previewExistente.remove();
 
     // Preview de imagen
     const fileInput = document.getElementById('imagen');
@@ -1192,6 +1203,8 @@ function cargarProductoParaModificar() {
 async function guardarCambiosProducto(e) {
     e.preventDefault(); // evita que recargue la página
 
+    console.log("ESTOY EN guardar CAMBIOS")
+
     const productoAModificar = localStorage.getItem('productoParaModificar')
 
     const { id_product } = JSON.parse(productoAModificar)
@@ -1202,20 +1215,23 @@ async function guardarCambiosProducto(e) {
     const stock = document.getElementById('stock').value;
     const active = document.getElementById('activo').value === 'true';
     const token = localStorage.getItem('adminToken');
+    const tipoSwitch = document.getElementById('tipoSwitch');
+    const type = tipoSwitch.checked ? 'teclado' : 'mouse';
 
-    console.log(id_product)
-
+    
     const payload = {
         name,
         description,
-        price,
-        stock,
-        active
+        price: parseFloat(price),
+        stock: parseInt(stock),
+        active,
+        type: document.getElementById('tipoSwitch').checked ? 'teclado' : 'mouse'
     };
-
-    console.log(payload)
-
+    
+    
     try {
+        console.log(payload)
+        console.log(id_product)
         const res = await fetch(`http://localhost:3000/api/productos/${id_product}`, {
             method: 'PUT',
             headers: {
@@ -1229,7 +1245,7 @@ async function guardarCambiosProducto(e) {
             const error = await res.json();
             throw new Error(error.message || 'Error al actualizar el producto');
         }
-
+        
         mostrarAlerta('Producto actualizado con éxito', 'success');
 
         // Limpiamos y redirigimos
@@ -1285,6 +1301,8 @@ async function altaProducto(producto, token) {
 async function handleSubmit(e) {
     e.preventDefault();
 
+    console.log("ESTOY EN HANDLE SUBMIT")
+
     const token = localStorage.getItem('adminToken');
     if (!token) {
         ('Error en la sesión - TOKEN INVALIDO.');
@@ -1327,7 +1345,7 @@ async function handleSubmit(e) {
         // Limpiar el formulario
         document.querySelector('form').reset();
     } catch (err) {
-        console.log(creado)
+        // console.log(creado)
         console.error(err);
         mostrarAlerta(`No se pudo crear el producto: ${err.message}`, 'danger');
     }
