@@ -1,3 +1,5 @@
+let isTestLogin = false;
+
 console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
     resaltarNavActivo();
@@ -18,9 +20,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (form) {
         form.addEventListener('submit', handleSubmit);
     }
+
+    const testButton = document.getElementById("testButton");
     const loginForm = document.getElementById("loginForm");
+
+    if (testButton) {
+        testButton.addEventListener("click", () => {
+            isTestLogin = true;
+            loginForm.requestSubmit(); // Forzar submit del formulario
+        });
+    }
+    
     if (loginForm) {
-        loginForm.addEventListener("submit", handleAdminLogin)
+        loginForm.addEventListener("submit", handleAdminLogin);
     }
     //Solo renderiza el carrito cuando estamos en la página del carrito
     if (document.getElementById('carrito-contenido')) {
@@ -62,22 +74,17 @@ async function handleAdminLogin(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    // const errorDiv = document.getElementById("loginError");
+    let email, password;
 
-    // Limpiar errores previos
-    // if (errorDiv) {
-    //     errorDiv.style.display = "none";
-    //     errorDiv.textContent = "";
-    // }
-
-    //DESCOMENTAR PARA DEBUGEAR EL FRONTEND - YA FUNCIONA (24/6)
-    // console.log("=== DEBUG FRONTEND ===");
-    // console.log("Email:", email);
-    // console.log("ESTA ES LA PASS: " + password)
-    // console.log("Password:", password ? "***" : "vacío");
-
+    if (isTestLogin) {
+        console.log("Test login activado");
+        email = "solotest@test.com";
+        password = "password123";
+    } else {
+        console.log("Login normal");
+        email = document.getElementById("email").value.trim();
+        password = document.getElementById("password").value.trim();
+    }
 
     try {
         console.log("Enviando request a:", "http://localhost:3000/api/administradores/login");
@@ -98,7 +105,7 @@ async function handleAdminLogin(event) {
         const responseData = await res.json();
         console.log("Response data:", responseData);
 
-        if (!res.status.toString().startsWith("2")) {
+        if (!res.ok) {
             mostrarAlerta("Credenciales inválidas", "danger");
             throw new Error(responseData.error || "Credenciales inválidas");
         }
@@ -118,14 +125,7 @@ async function handleAdminLogin(event) {
     } catch (err) {
         console.error("Login error:", err);
 
-        // Mostrar error solo si existe el elemento
-        // if (errorDiv) {
-        //     errorDiv.textContent = err.message;
-        //     errorDiv.style.display = "block";
-        // } else {
-        //     // Fallback si no existe el div de error
-        //     alert("Error: " + err.message);
-        // }
+        mostrarAlerta("Error al iniciar sesión: " + err.message, "danger");
     }
 }
 
