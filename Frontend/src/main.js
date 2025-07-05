@@ -27,14 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formModificar = document.getElementById('formModificar');
     const formAlta = document.getElementById('formAlta'); // Asumiendo que tu formulario de alta tiene este ID
-    
+
     if (formModificar) {
         const productoParaModificar = localStorage.getItem('productoParaModificar');
         if (productoParaModificar) {
             isEditMode = true;
             cargarProductoParaModificar();
         }
-        
+
         formModificar.addEventListener('submit', (e) => {
             if (isEditMode) {
                 guardarCambiosProducto(e);
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (formAlta && !isEditMode) {
-    formAlta.addEventListener('submit', handleSubmit);
+        formAlta.addEventListener('submit', handleSubmit);
     }
 
     const testButton = document.getElementById("testButton");
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
             loginForm.requestSubmit(); // Forzar submit del formulario
         });
     }
-    
+
     if (loginForm) {
         loginForm.addEventListener("submit", handleAdminLogin);
     }
@@ -290,68 +290,68 @@ function vaciarCarritoConfirmado() {
 }
 
 async function procederCompra() {
-  if (carrito.length === 0) {
-    mostrarAlerta('Tu carrito está vacío', 'warning');
-    return;
-  }
-
-  const nombreUsuario = localStorage.getItem('nombreCliente');
-  const medioPago     = document.getElementById('medio-pago').value;
-  const totalCompra   = calcularTotalCarrito();
-
-  // 1) Construir el array de productos con los campos correctos
-  const productosPayload = carrito.map(item => ({
-    id_product: item.id_product,                              // la clave real de tu objeto
-    cantidad:   item.cantidad,                                // la clave real
-    subtotal:   parseFloat(item.price) * item.cantidad        // convierte price (string) a número
-  }));
-
-  try {
-    // 2) Enviar la venta al backend
-    const res = await fetch('http://localhost:3000/api/ventas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nombre_usuario: nombreUsuario,
-        medio_pago:     medioPago,
-        monto:          totalCompra,
-        productos:      productosPayload
-      })
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      console.error('Error al registrar venta:', error);
-      mostrarAlerta('Error al registrar la venta', 'danger');
-      return;
+    if (carrito.length === 0) {
+        mostrarAlerta('Tu carrito está vacío', 'warning');
+        return;
     }
 
-    const venta = await res.json();
-    console.log('Venta registrada:', venta);
+    const nombreUsuario = localStorage.getItem('nombreCliente');
+    const medioPago = document.getElementById('medio-pago').value;
+    const totalCompra = calcularTotalCarrito();
 
-    // 3) Guardar info para el ticket y limpiar carrito
-    const compra = {
-      productos: [...carrito],
-      total:     totalCompra,
-      fecha:     obtenerFecha(),
-      cliente:   nombreUsuario,
-      medioPago: medioPago
-    };
-    localStorage.setItem('ultimaCompra', JSON.stringify(compra));
+    // 1) Construir el array de productos con los campos correctos
+    const productosPayload = carrito.map(item => ({
+        id_product: item.id_product,                              // la clave real de tu objeto
+        cantidad: item.cantidad,                                // la clave real
+        subtotal: parseFloat(item.price) * item.cantidad        // convierte price (string) a número
+    }));
 
-    carrito = [];
-    guardarCarrito();
-    actualizarContadorCarrito();
+    try {
+        // 2) Enviar la venta al backend
+        const res = await fetch('http://localhost:3000/api/ventas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nombre_usuario: nombreUsuario,
+                medio_pago: medioPago,
+                monto: totalCompra,
+                productos: productosPayload
+            })
+        });
 
-    mostrarAlerta('¡Compra realizada con éxito! Redirigiendo al ticket...', 'success');
-    setTimeout(() => {
-      window.location.href = 'ticket.html';
-    }, 2000);
+        if (!res.ok) {
+            const error = await res.json();
+            console.error('Error al registrar venta:', error);
+            mostrarAlerta('Error al registrar la venta', 'danger');
+            return;
+        }
 
-  } catch (err) {
-    console.error('Error al procesar la compra:', err);
-    mostrarAlerta('Ocurrió un error inesperado', 'danger');
-  }
+        const venta = await res.json();
+        console.log('Venta registrada:', venta);
+
+        // 3) Guardar info para el ticket y limpiar carrito
+        const compra = {
+            productos: [...carrito],
+            total: totalCompra,
+            fecha: obtenerFecha(),
+            cliente: nombreUsuario,
+            medioPago: medioPago
+        };
+        localStorage.setItem('ultimaCompra', JSON.stringify(compra));
+
+        carrito = [];
+        guardarCarrito();
+        actualizarContadorCarrito();
+
+        mostrarAlerta('¡Compra realizada con éxito! Redirigiendo al ticket...', 'success');
+        setTimeout(() => {
+            window.location.href = 'ticket.html';
+        }, 2000);
+
+    } catch (err) {
+        console.error('Error al procesar la compra:', err);
+        mostrarAlerta('Ocurrió un error inesperado', 'danger');
+    }
 }
 
 
@@ -518,6 +518,10 @@ function inicializarTema() {
     const footer = document.querySelector('footer');
     const botonTecl = document.getElementById('btn-teclados');
     const botonMous = document.getElementById('btn-mouses');
+    const botonIngresar = document.getElementById('btnIngresar');
+    const botonLogin = document.getElementById('loginButton');
+    const botonTest = document.getElementById('testButton');
+
 
     if (temaGuardado === 'dark') {
         if (main) {
@@ -537,9 +541,23 @@ function inicializarTema() {
             botonMous.classList.add('bg-completly-black');
         }
 
+        if (botonIngresar) {
+            botonIngresar.classList.remove('btn-dark');
+            botonIngresar.classList.add('bg-completly-black');
+        }
+
+        if (botonLogin) {
+            botonLogin.classList.remove('btn-dark');
+            botonLogin.classList.add('bg-completly-black');
+        }
+
+        if (botonTest) {
+            botonTest.classList.remove('btn-dark');
+            botonTest.classList.add('bg-completly-black');
+        }
+
         if (card) {
             card.classList.remove('bg-light');
-            // card.classList.add('bg-dark', 'text-white');
         }
 
         if (navbar) {
@@ -1206,14 +1224,14 @@ async function guardarCambiosProducto(e) {
     console.log("ESTOY EN guardar CAMBIOS");
 
     const productoAModificar = localStorage.getItem('productoParaModificar');
-    
+
     if (!productoAModificar) {
         mostrarAlerta('No se encontró el producto a modificar', 'danger');
         return;
     }
 
     const { id_product } = JSON.parse(productoAModificar);
-    
+
     const name = document.getElementById('nombre').value.trim();
     const description = document.getElementById('descripcion').value.trim();
     const price = document.getElementById('precio').value;
@@ -1228,12 +1246,12 @@ async function guardarCambiosProducto(e) {
         mostrarAlerta('El nombre del producto es requerido', 'danger');
         return;
     }
-    
+
     if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
         mostrarAlerta('El precio debe ser un número válido mayor a 0', 'danger');
         return;
     }
-    
+
     if (!stock || isNaN(parseInt(stock)) || parseInt(stock) < 0) {
         mostrarAlerta('El stock debe ser un número válido mayor o igual a 0', 'danger');
         return;
@@ -1247,11 +1265,11 @@ async function guardarCambiosProducto(e) {
         active,
         type
     };
-    
+
     try {
         console.log('Payload a enviar:', payload);
         console.log('ID del producto:', id_product);
-        
+
         const res = await fetch(`http://localhost:3000/api/productos/${id_product}`, {
             method: 'PUT',
             headers: {
@@ -1266,10 +1284,10 @@ async function guardarCambiosProducto(e) {
             console.error('Error del servidor:', error);
             throw new Error(error.message || 'Error al actualizar el producto');
         }
-        
+
         const result = await res.json();
         console.log('Respuesta del servidor:', result);
-        
+
         mostrarAlerta('Producto actualizado con éxito', 'success');
 
         // Limpiamos y redirigimos
