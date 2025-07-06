@@ -995,6 +995,7 @@ function mostrarPagina(pagina) {
             <td>${producto.id_product}</td>
             <td>${producto.name}</td>
             <td>$${producto.price}</td>
+            <td>${producto.type}</td>
             <td>${producto.active ? 'Sí' : 'No'}</td>
             <td>
                 <div class="form-check form-switch d-inline-block me-2">
