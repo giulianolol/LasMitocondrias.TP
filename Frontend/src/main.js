@@ -374,7 +374,7 @@ function actualizarContadorCarrito() {// Actualizar contador en navbar si existe
 
 
 function agregarAlCarrito(producto) {
-    const productoExistente = carrito.find(item => item.id === producto.id);
+    const productoExistente = carrito.find(item => item.id_product === producto.id_product);
 
     if (productoExistente) {
         productoExistente.cantidad += 1;
@@ -659,7 +659,7 @@ async function mostrarTeclados() {
                         <h5 class="card-title text-white">${teclado.name}</h5>
                         <p class="card-text text-white">Tipo: ${teclado.type}</p>
                         <p class="card-text text-white">Precio: $${teclado.price}</p>
-                        <p class="card-text text-success">Estado: ${teclado.active}</p>
+
                         <p class="card-text ">Stock: ${teclado.stock == null ? "Sin stock" : teclado.stock}</p>
                         <p class="card-text ">Descripción: ${acortarDescripcion(teclado.description, 100)}</p>
                     </div>
@@ -712,7 +712,7 @@ async function mostrarMouses() {
                         <h5 class="card-title">${mouse.name}</h5>
                         <p class="card-text">Tipo: ${mouse.type}</p>
                         <p class="card-text">Precio: $${mouse.price}</p>
-                        <p class="card-text text-success">Estado: ${mouse.active}</p>
+
                         <p class="card-text">Stock: ${mouse.stock}</p>
                         <p class="card-text ">Descripción: ${acortarDescripcion(mouse.description, 100)}</p>
                         <div class="mt-auto">
@@ -780,7 +780,7 @@ function renderizarPaginaTeclados() {
                     <h5 class="card-title">${teclado.name}</h5>
                     <p class="card-text">Tipo: ${teclado.type}</p>
                     <p class="card-text">Precio: $${teclado.price}</p>
-                    <p class="card-text text-success">Estado: ${teclado.active}</p>
+
                     <p class="card-text ">Stock: ${teclado.stock == null ? "Sin stock" : teclado.stock}</p>
                     <p class="card-text ">Descripción: ${acortarDescripcion(teclado.description, 100)}</p>
                     <div class="mt-auto">
@@ -895,7 +895,7 @@ function renderizarPaginaMouses() {
                     <h5 class="card-title">${mouse.name}</h5>
                     <p class="card-text">Tipo: ${mouse.type}</p>
                     <p class="card-text">Precio: $${mouse.price}</p>
-                    <p class="card-text text-success">Estado: ${mouse.active}</p>
+
                     <p class="card-text">Stock: ${mouse.stock == null ? "Sin stock" : mouse.stock}</p>
                     <p class="card-text">Descripción: ${acortarDescripcion(mouse.description, 100)}</p>
                     <div class="mt-auto">
