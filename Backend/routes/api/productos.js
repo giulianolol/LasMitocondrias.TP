@@ -3,6 +3,7 @@ const {verificarToken,tokenAdmin} = require('../../middlewares/authAdmin');
 const router = express.Router();
 const {
   getProductos,
+  getProductosActivos,
   getProductoById,
   createProducto,
   updateProducto,
@@ -13,6 +14,10 @@ const {
 // 1) Listar productos 
 //    GET /api/productos
 router.get('/', getProductos);
+
+// 1) Listar productos activos
+//    GET /api/productos/activos
+router.get('/activos', getProductosActivos);
 
 // 2) Obtener producto por id
 router.get('/:id', getProductoById)

@@ -18,6 +18,19 @@ exports.getProductos = async (req, res) => {
   }
 };
 
+exports.getProductosActivos = async (req, res) => {
+  try {
+    const productos = await Product.findAll({
+      where: { active: true }, // Solo productos activos
+      order: [['name', 'ASC']]
+    });
+    return res.status(200).json(productos);
+  } catch (err) {
+    console.error('Error en getProductos:', err);
+    return res.status(500).json({ error: 'Error al consultar productos' });
+  }
+};
+
 //POST /api/productos
 //Crea un nuevo producto. El body debe incluir:
 //{ name, description, price, stock, active, imageUrl, type }

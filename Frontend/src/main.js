@@ -637,7 +637,7 @@ async function mostrarTeclados() {
     contenedor.innerHTML = '';
 
     try {
-        const res = await fetch('http://localhost:3000/api/productos');
+        const res = await fetch('http://localhost:3000/api/productos/activos');
         console.log('Petición a la API de productos realizada');
 
         if (!res.ok) throw new Error('Error al obtener productos');
@@ -690,7 +690,7 @@ async function mostrarMouses() {
     contenedor.innerHTML = '';
 
     try {
-        const res = await fetch('http://localhost:3000/api/productos');
+        const res = await fetch('http://localhost:3000/api/productos/activos');
         console.log('Petición a la API de productos realizada');
 
         if (!res.ok) throw new Error('Error al obtener productos');
@@ -744,7 +744,7 @@ async function mostrarTecladosPaginacion() {
     contenedor.innerHTML = '';
 
     try {
-        const res = await fetch('http://localhost:3000/api/productos');
+        const res = await fetch('http://localhost:3000/api/productos/activos');
         if (!res.ok) throw new Error('Error al obtener productos');
 
         const productos = await res.json();
@@ -859,7 +859,7 @@ async function mostrarMousesPaginacion() {
     contenedor.innerHTML = '';
 
     try {
-        const res = await fetch('http://localhost:3000/api/productos');
+        const res = await fetch('http://localhost:3000/api/productos/activos');
         if (!res.ok) throw new Error('Error al obtener productos');
 
         const productos = await res.json();
