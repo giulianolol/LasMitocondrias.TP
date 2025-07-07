@@ -23,7 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarContadorCarrito();
     mostrarProductos();
     inicializarTema();
-    tecladoVirtual();
+    configurarBotonesCategorias();
+    if (window.location.pathname.includes('index.html')) {
+        tecladoVirtual();
+    }
     // initAltaFormulario();
 
     const formModificar = document.getElementById('formModificar');
@@ -80,7 +83,7 @@ let carrito = [];
 async function handleAdminLogin(event) {
     event.preventDefault();
     event.stopPropagation();
-
+    console
     let email, password;
 
     if (isTestLogin) {
