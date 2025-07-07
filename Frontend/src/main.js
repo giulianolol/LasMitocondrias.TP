@@ -9,7 +9,6 @@ function initAltaFormulario() {
     }
 }
 
-console.log("main cargado")
 document.addEventListener("DOMContentLoaded", () => {
     resaltarNavActivo();
     manejarBienvenida();
@@ -27,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.location.pathname.includes('index.html')) {
         tecladoVirtual();
     }
-    // initAltaFormulario();
 
     const formModificar = document.getElementById('formModificar');
     const formAlta = document.getElementById('formAlta'); // Asumiendo que tu formulario de alta tiene este ID
@@ -89,17 +87,14 @@ async function handleAdminLogin(event) {
     let email, password;
 
     if (isTestLogin) {
-        console.log("Test login activado");
         email = "solotest@test.com";
         password = "password123";
     } else {
-        console.log("Login normal");
         email = document.getElementById("email").value.trim();
         password = document.getElementById("password").value.trim();
     }
 
     try {
-        console.log("Enviando request a:", "http://localhost:3000/api/administradores/login");
 
         const res = await fetch("http://localhost:3000/api/administradores/login", {
             method: "POST",
@@ -110,12 +105,8 @@ async function handleAdminLogin(event) {
 
         });
 
-        console.log("Response status:", res.status);
-        console.log("Response ok:", res.ok);
-
         // Leer la respuesta
         const responseData = await res.json();
-        console.log("Response data:", responseData);
 
         if (!res.ok) {
             mostrarAlerta("Credenciales inválidas", "danger");
@@ -123,7 +114,6 @@ async function handleAdminLogin(event) {
         }
 
         const { token } = responseData;
-        console.log("Token recibido:", token ? "OK" : "ERROR EN TOKEN");
 
         // Guardamos el JWT en localStorage
         localStorage.setItem("adminToken", token);
@@ -169,7 +159,6 @@ function isTokenExpired(token) {
 function inicializarCarrito() {
     const carritoLS = localStorage.getItem('carrito');
     carrito = carritoLS ? JSON.parse(carritoLS) : [];
-    console.log(carrito)
 }
 
 function renderizarCarrito() {
@@ -206,7 +195,6 @@ function renderizarCarrito() {
     if (btnVaciar) btnVaciar.disabled = false;
 
     // carritoLocal = localStorage.getItem('carrito')
-    // console.log(carritoLocal)
 
     // Generar HTML de los productos
     contenidoCarrito.innerHTML = `
@@ -251,7 +239,6 @@ function renderizarCarrito() {
 }
 
 function cambiarCantidad(productoNombre, cambio) {
-
 
     const producto = carrito.find(item => item.name === productoNombre);
     if (!producto) return;
@@ -334,7 +321,6 @@ async function procederCompra() {
 
         const venta = await res.json();
         console.log('Venta registrada:', venta);
-
         // 3) Guardar info para el ticket y limpiar carrito
         const compra = {
             productos: [...carrito],
@@ -396,7 +382,6 @@ function agregarAlCarrito(producto) {
     guardarCarrito();
     actualizarContadorCarrito();
     renderizarCarrito(); // Actualizar vista si estamos en la página del carrito
-    console.log(carritoTest)
 }
 
 function guardarCarrito() {
@@ -631,7 +616,6 @@ function mostrarAlerta(mensaje, tipo = "success", duracion = 3000) {
 }
 
 async function mostrarTeclados() {
-    console.log('Cargando teclados...');
 
     const contenedor = document.querySelector('#seccion-teclados .row');
     const spinner = document.getElementById('spinner');
@@ -644,20 +628,16 @@ async function mostrarTeclados() {
 
     try {
         const res = await fetch('http://localhost:3000/api/productos/activos');
-        console.log('Petición a la API de productos realizada');
 
         if (!res.ok) throw new Error('Error al obtener productos');
 
         const productos = await res.json();
-        console.log('Productos obtenidos:', productos);
 
         const teclados = productos.filter(p => p.type === 'teclado');
-        console.log('Teclados filtrados:', teclados);
 
         teclados.forEach(teclado => {
             const col = document.createElement('div');
             col.className = 'col-md-4';
-            console.log('Teclado procesado:', teclado);
             col.innerHTML = `
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
                     <img src="${teclado.imageUrl || '../assets/img/default.png'}" class="card-img-top img-fluid object-fit-cover h-100" alt="${teclado.name}" />
@@ -676,7 +656,6 @@ async function mostrarTeclados() {
         });
 
     } catch (err) {
-        console.log('Error al cargar teclados:', err);
         mostrarAlerta('Error al cargar teclados', 'danger');
     } finally {
         spinner.style.display = 'none';
@@ -684,7 +663,6 @@ async function mostrarTeclados() {
 }
 
 async function mostrarMouses() {
-    console.log('Cargando mouses...');
 
     const contenedor = document.querySelector('#seccion-mouses .row');
     const spinner = document.getElementById('spinner');
@@ -697,15 +675,12 @@ async function mostrarMouses() {
 
     try {
         const res = await fetch('http://localhost:3000/api/productos/activos');
-        console.log('Petición a la API de productos realizada');
 
         if (!res.ok) throw new Error('Error al obtener productos');
 
         const productos = await res.json();
-        console.log('Productos obtenidos:', productos);
 
         const mouses = productos.filter(p => p.type === 'mouse');
-        console.log('Mouses filtrados:', mouses);
 
         mouses.forEach(mouse => {
             const col = document.createElement('div');
@@ -947,8 +922,6 @@ function mostrarSeccionMouses() {
     mostrarMousesPaginacion();
 }
 
-// console.log(carritoTest)
-
 function eliminarDelLocalStorage(clave) {
     localStorage.removeItem(clave);
 }
@@ -959,7 +932,6 @@ let paginaActual2 = 1;
 const productosPorPagina = 10;
 
 async function mostrarProductos() {
-    console.log('Cargando productos...');
 
     const tbody = document.getElementById('tabla-productos');
     const spinner = document.getElementById('spinner');
@@ -974,12 +946,10 @@ async function mostrarProductos() {
         if (!res.ok) throw new Error('Error al obtener productos');
 
         productosGlobal = await res.json(); // guardamos todos
-        console.log('Productos obtenidos:', productosGlobal);
 
         mostrarPagina(paginaActual2); // mostrar solo la página actual
 
     } catch (err) {
-        console.error(err);
         mostrarAlerta('Error al cargar productos', 'danger');
     } finally {
         if (spinner) spinner.style.display = 'none';
@@ -1064,8 +1034,6 @@ async function toggleProductoEstado(id, nuevoEstado, switchElement) {
             headers: headers,
             body: JSON.stringify({ active: nuevoEstado })
         });
-
-        console.log(res);
 
         if (!res.ok) throw new Error('Error al actualizar el estado del producto');
 
@@ -1182,7 +1150,6 @@ async function modificarProducto(id) {
 
     try {
         const token = localStorage.getItem('adminToken');
-        console.log('Token de administrador:', token);
         const res = await fetch(`http://localhost:3000/api/productos/${id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -1192,7 +1159,6 @@ async function modificarProducto(id) {
         // Llevamos el id en la query string (creo que no es necesario igualmente)
         window.location.href = `modificaciones.html?id=${id}`;
     } catch (err) {
-        console.error(err);
         mostrarAlerta('No se pudo preparar la modificación del producto.', 'danger');
     }
 
@@ -1205,8 +1171,6 @@ function cargarProductoParaModificar() {
         return;
     }
     const p = JSON.parse(productoJSON);
-
-    console.log(p)
 
     // Campo oculto para el ID
     let inputId = document.getElementById('productoId');
@@ -1269,8 +1233,6 @@ function cargarProductoParaModificar() {
 async function guardarCambiosProducto(e) {
     e.preventDefault();
 
-    console.log("ESTOY EN guardar CAMBIOS");
-
     const productoAModificar = localStorage.getItem('productoParaModificar');
 
     if (!productoAModificar) {
@@ -1284,7 +1246,6 @@ async function guardarCambiosProducto(e) {
     const description = document.getElementById('descripcion').value.trim();
     const price = document.getElementById('precio').value;
     const image = document.getElementById('imagen').value;
-    console.log('Imagen seleccionada:', image);
     const stock = document.getElementById('stock').value;
     const active = document.getElementById('activo').value === 'true';
     const token = localStorage.getItem('adminToken');
@@ -1318,8 +1279,6 @@ async function guardarCambiosProducto(e) {
     };
 
     try {
-        console.log('Payload a enviar:', payload);
-        console.log('ID del producto:', id_product);
 
         const res = await fetch(`http://localhost:3000/api/productos/${id_product}`, {
             method: 'PUT',
@@ -1337,7 +1296,6 @@ async function guardarCambiosProducto(e) {
         }
 
         const result = await res.json();
-        console.log('Respuesta del servidor:', result);
 
         mostrarAlerta('Producto actualizado con éxito', 'success');
 
@@ -1394,7 +1352,6 @@ async function altaProducto(producto, token) {
 async function handleSubmit(e) {
     e.preventDefault();
 
-    console.log("ESTOY EN HANDLE SUBMIT")
 
     const token = localStorage.getItem('adminToken');
     if (!token) {
@@ -1426,11 +1383,8 @@ async function handleSubmit(e) {
 
     };
 
-    console.log('Payload de altaProducto:', producto)
-
     try {
         const creado = await altaProducto(producto, token);
-        console.log(creado)
         mostrarAlerta(`Producto "${creado.name}" creado con ID ${creado.id_product}`, 'success');
         setTimeout(() => {
             window.location.href = 'dashboard.html'; // redirigir al dashboard
@@ -1438,8 +1392,6 @@ async function handleSubmit(e) {
         // Limpiar el formulario
         document.querySelector('form').reset();
     } catch (err) {
-        // console.log(creado)
-        console.error(err);
         mostrarAlerta(`No se pudo crear el producto: ${err.message}`, 'danger');
     }
 }
