@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderTicketPage();
     }
 
-    if (window.location.pathname.includes('productos.html')) {    
+    if (window.location.pathname.includes('productos.html')) {
         document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
         document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
     }
@@ -660,7 +660,7 @@ async function mostrarTeclados() {
             console.log('Teclado procesado:', teclado);
             col.innerHTML = `
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                    <img src="${teclado.imageUrl}" class="card-img-top img-fluid object-fit-cover h-100" alt="${teclado.name}" />
+                    <img src="${teclado.imageUrl || '../assets/img/default.png'}" class="card-img-top img-fluid object-fit-cover h-100" alt="${teclado.name}" />
                     <div class="card-body">
                         <h5 class="card-title text-white">${teclado.name}</h5>
                         <p class="card-text text-white">Tipo: ${teclado.type}</p>
@@ -713,7 +713,7 @@ async function mostrarMouses() {
 
             col.innerHTML = `
                 <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                    <img src="${mouse.imageUrl}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${mouse.name}" />
+                    <img src="${mouse.imageUrl || '../assets/img/default.png'}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${mouse.name}" />
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">${mouse.name}</h5>
                         <p class="card-text">Tipo: ${mouse.type}</p>
@@ -781,7 +781,7 @@ function renderizarPaginaTeclados() {
         col.className = 'col-md-4 mb-4';
         col.innerHTML = `
             <div  class="card bg-dark text-white h-100 shadow-sm rounded-4 teclados">
-                <img src="${teclado.imageUrl}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${teclado.name}" />
+                <img src="${teclado.imageUrl || '../assets/img/default.png'}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${teclado.name}" />
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${teclado.name}</h5>
                     <p class="card-text">Tipo: ${teclado.type}</p>
@@ -896,7 +896,7 @@ function renderizarPaginaMouses() {
         col.className = 'col-md-4 mb-4';
         col.innerHTML = `
             <div class="card bg-dark text-white h-100 shadow-sm rounded-4">
-                <img src="${mouse.imageUrl}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${mouse.name}" />
+                <img src="${mouse.imageUrl || '../assets/img/default.png'}" class="card-img-top img-fluid object-fit-cover" style="height: 200px;" alt="${mouse.name}" />
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${mouse.name}</h5>
                     <p class="card-text">Tipo: ${mouse.type}</p>
@@ -1034,7 +1034,7 @@ if (window.location.pathname.includes('dashboard.html')) {
             mostrarPagina(paginaActual2);
         }
     });
-    
+
     document.getElementById('btnSiguiente').addEventListener('click', () => {
         const maxPaginas = Math.ceil(productosGlobal.length / productosPorPagina);
         if (paginaActual2 < maxPaginas) {
@@ -1283,6 +1283,8 @@ async function guardarCambiosProducto(e) {
     const name = document.getElementById('nombre').value.trim();
     const description = document.getElementById('descripcion').value.trim();
     const price = document.getElementById('precio').value;
+    const image = document.getElementById('imagen').value;
+    console.log('Imagen seleccionada:', image);
     const stock = document.getElementById('stock').value;
     const active = document.getElementById('activo').value === 'true';
     const token = localStorage.getItem('adminToken');
@@ -1308,6 +1310,7 @@ async function guardarCambiosProducto(e) {
     const payload = {
         name,
         description,
+        image,
         price: parseFloat(price),
         stock: parseInt(stock),
         active,
@@ -1340,7 +1343,7 @@ async function guardarCambiosProducto(e) {
 
         // Limpiamos y redirigimos
         localStorage.removeItem('productoParaModificar');
-        window.location.href = 'dashboard.html';
+        // window.location.href = 'dashboard.html';
     } catch (err) {
         console.error('Error completo:', err);
         mostrarAlerta('Error al guardar cambios: ' + err.message, 'danger');

@@ -99,15 +99,17 @@ exports.updateProducto = async (req, res) => {
     console.log(' BODY:', req.body);
     console.log(' PARAMS ID:', req.params.id);
 
-    const { name, description, price, stock, type, active } = req.body;
+    const { name, description, image, price, stock, type, active } = req.body;
+    console.log(' Datos recibidos:', { image});
 
     const updates = {};
-    if (name        !== undefined) updates.name        = name;
+    if (name !== undefined) updates.name = name;
     if (description !== undefined) updates.description = description;
-    if (price       !== undefined) updates.price       = price;
-    if (stock       !== undefined) updates.stock       = stock;
-    if (type        !== undefined) updates.type        = type;
-    if (active      !== undefined) updates.active      = active;
+    if (price !== undefined) updates.price = price;
+    if (image !== undefined) updates.imageUrl = image;
+    if (stock !== undefined) updates.stock = stock;
+    if (type !== undefined) updates.type = type;
+    if (active !== undefined) updates.active = active;
 
     console.log(' Updates a aplicar:', updates);
 
