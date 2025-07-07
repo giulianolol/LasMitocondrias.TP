@@ -5,10 +5,21 @@ require('dotenv').config();
 const path = require('path');
 
 // Inicializar Sequelize
+// const sequelize = new Sequelize(process.env.SUPABASE_DB_URL, {
+//   dialect: 'postgres',
+//   logging: false,
+// });
 const sequelize = new Sequelize(process.env.SUPABASE_DB_URL, {
   dialect: 'postgres',
   logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // necesario para certificados no verificados
+    }
+  }
 });
+
 
 // Verificar la conexión
 (async () => {
@@ -21,11 +32,11 @@ const sequelize = new Sequelize(process.env.SUPABASE_DB_URL, {
 })();
 
 // Importar los modelos
-const Product       = require(path.join(__dirname, 'product'))(sequelize, DataTypes);
+const Product = require(path.join(__dirname, 'product'))(sequelize, DataTypes);
 const Administrator = require(path.join(__dirname, 'administrator'))(sequelize, DataTypes);
-const Venta         = require(path.join(__dirname, 'venta'))(sequelize, DataTypes);
-const Ticket        = require(path.join(__dirname, 'ticket'))(sequelize, DataTypes);
-const Pago          = require(path.join(__dirname, 'pago'))(sequelize, DataTypes);
+const Venta = require(path.join(__dirname, 'venta'))(sequelize, DataTypes);
+const Ticket = require(path.join(__dirname, 'ticket'))(sequelize, DataTypes);
+const Pago = require(path.join(__dirname, 'pago'))(sequelize, DataTypes);
 
 //  Registrar modelos en el objeto db
 const db = {
