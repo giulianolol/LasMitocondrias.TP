@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarContadorCarrito();
     mostrarProductos();
     inicializarTema();
+    tecladoVirtual();
     // initAltaFormulario();
 
     const formModificar = document.getElementById('formModificar');
@@ -1439,4 +1440,27 @@ function initAltaFormulario() {
     if (form) {
         form.addEventListener('submit', handleSubmit);
     }
+}
+
+function tecladoVirtual() {
+    const teclado = document.getElementById('teclado');
+    const input = document.getElementById('nombreUsuario');
+
+    teclado.addEventListener('click', function (e) {
+        if (e.target.tagName === 'BUTTON') {
+            const valor = e.target.textContent;
+
+            if (valor === '←') {
+                input.value = input.value.slice(0, -1);
+            } else if (valor === 'Espacio') {
+                input.value += ' ';
+            } else if (valor === 'Limpiar') {
+                input.value = '';
+            } else {
+                input.value += valor;
+            }
+
+            input.focus();
+        }
+    });
 }

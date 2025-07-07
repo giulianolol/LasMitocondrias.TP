@@ -18,6 +18,8 @@ exports.getProductos = async (req, res) => {
   }
 };
 
+//GET /api/productos/activos
+//Devuelve un array de todos los productos activos.
 exports.getProductosActivos = async (req, res) => {
   try {
     const productos = await Product.findAll({
