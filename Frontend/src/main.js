@@ -1025,20 +1025,22 @@ function mostrarPagina(pagina) {
 }
 
 // eventos de los botones
-document.getElementById('btnAnterior').addEventListener('click', () => {
-    if (paginaActual2 > 1) {
-        paginaActual2--;
-        mostrarPagina(paginaActual2);
-    }
-});
-
-document.getElementById('btnSiguiente').addEventListener('click', () => {
-    const maxPaginas = Math.ceil(productosGlobal.length / productosPorPagina);
-    if (paginaActual2 < maxPaginas) {
-        paginaActual2++;
-        mostrarPagina(paginaActual2);
-    }
-});
+if (window.location.pathname.includes('dashboard.html')) {
+    document.getElementById('btnAnterior').addEventListener('click', () => {
+        if (paginaActual2 > 1) {
+            paginaActual2--;
+            mostrarPagina(paginaActual2);
+        }
+    });
+    
+    document.getElementById('btnSiguiente').addEventListener('click', () => {
+        const maxPaginas = Math.ceil(productosGlobal.length / productosPorPagina);
+        if (paginaActual2 < maxPaginas) {
+            paginaActual2++;
+            mostrarPagina(paginaActual2);
+        }
+    });
+}
 
 // Función para manejar el cambio de estado del producto - MOMENTANEA
 async function toggleProductoEstado(id, nuevoEstado, switchElement) {
