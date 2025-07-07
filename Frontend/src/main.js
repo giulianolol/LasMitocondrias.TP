@@ -73,8 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
         renderTicketPage();
     }
 
-    document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
-    document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
+    if (window.location.pathname.includes('productos.html')) {    
+        document.getElementById('btn-teclados').addEventListener('click', mostrarSeccionTeclados);
+        document.getElementById('btn-mouses').addEventListener('click', mostrarSeccionMouses);
+    }
 });
 
 let carrito = [];
