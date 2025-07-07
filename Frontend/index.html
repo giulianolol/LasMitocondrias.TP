@@ -60,42 +60,46 @@
                         <input type="text" id="nombreUsuario" class="form-control mb-3" placeholder="Tu nombre">
 
                         <!-- Teclado en pantalla -->
-                        <div id="teclado" class="mb-3 d-grid gap-2" style="grid-template-columns: repeat(10, 1fr);">
-                            <!-- Letras del teclado -->
-                            <button class="btn btn-outline-secondary">Q</button>
-                            <button class="btn btn-outline-secondary">W</button>
-                            <button class="btn btn-outline-secondary">E</button>
-                            <button class="btn btn-outline-secondary">R</button>
-                            <button class="btn btn-outline-secondary">T</button>
-                            <button class="btn btn-outline-secondary">Y</button>
-                            <button class="btn btn-outline-secondary">U</button>
-                            <button class="btn btn-outline-secondary">I</button>
-                            <button class="btn btn-outline-secondary">O</button>
-                            <button class="btn btn-outline-secondary">P</button>
+                        <div id="teclado" class="mb-3 d-flex flex-wrap justify-content-center gap-2">
+                            <!-- Letras -->
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">Q</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">W</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">E</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">R</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">T</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">Y</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">U</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">I</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">O</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">P</button>
 
-                            <button class="btn btn-outline-secondary">A</button>
-                            <button class="btn btn-outline-secondary">S</button>
-                            <button class="btn btn-outline-secondary">D</button>
-                            <button class="btn btn-outline-secondary">F</button>
-                            <button class="btn btn-outline-secondary">G</button>
-                            <button class="btn btn-outline-secondary">H</button>
-                            <button class="btn btn-outline-secondary">J</button>
-                            <button class="btn btn-outline-secondary">K</button>
-                            <button class="btn btn-outline-secondary">L</button>
-                            <button class="btn btn-outline-secondary">Ñ</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">A</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">S</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">D</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">F</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">G</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">H</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">J</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">K</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">L</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">Ñ</button>
 
-                            <button class="btn btn-outline-secondary">Z</button>
-                            <button class="btn btn-outline-secondary">X</button>
-                            <button class="btn btn-outline-secondary">C</button>
-                            <button class="btn btn-outline-secondary">V</button>
-                            <button class="btn btn-outline-secondary">B</button>
-                            <button class="btn btn-outline-secondary">N</button>
-                            <button class="btn btn-outline-secondary">M</button>
-                            <button class="btn btn-outline-secondary" id="borrar">←</button>
-                            <button class="btn btn-outline-secondary" id="espacio">Espacio</button>
-                            <button class="btn btn-outline-secondary" id="limpiar">Limpiar</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">Z</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">X</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">C</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">V</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">B</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">N</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 8%">M</button>
+
+                            <!-- Funcionales -->
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 20%"
+                                id="borrar">←</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 30%"
+                                id="espacio">Espacio</button>
+                            <button class="btn btn-outline-secondary flex-grow-1" style="flex-basis: 20%"
+                                id="limpiar">Limpiar</button>
                         </div>
-
                         <button id="btnIngresar" class="btn btn-dark w-100">Ingresar</button>
                     </div>
                 </div>
