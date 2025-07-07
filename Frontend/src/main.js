@@ -61,8 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (loginForm) {
-        loginForm.addEventListener("submit", handleAdminLogin);
+        loginForm.addEventListener("submit", (e) => {
+            handleAdminLogin(e);
+            isTestLogin = false; // Reseteamos después del uso
+        });
     }
+
     //Solo renderiza el carrito cuando estamos en la página del carrito
     if (document.getElementById('carrito-contenido')) {
         renderizarCarrito();
@@ -83,7 +87,12 @@ let carrito = [];
 async function handleAdminLogin(event) {
     event.preventDefault();
     event.stopPropagation();
-    console
+
+    const boton = document.getElementById("loginButton");
+    const textoOriginal = boton.innerHTML;
+    boton.disabled = true;
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Ingresando...';
+
     let email, password;
 
     if (isTestLogin) {
@@ -95,17 +104,14 @@ async function handleAdminLogin(event) {
     }
 
     try {
-
         const res = await fetch("http://localhost:3000/api/administradores/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ email, password })
-
         });
 
-        // Leer la respuesta
         const responseData = await res.json();
 
         if (!res.ok) {
@@ -114,11 +120,8 @@ async function handleAdminLogin(event) {
         }
 
         const { token } = responseData;
-
-        // Guardamos el JWT en localStorage
         localStorage.setItem("adminToken", token);
 
-        // Redirigimos al dashboard
         mostrarAlerta("Login exitoso. Redirigiendo al dashboard...", "success");
         setTimeout(() => {
             window.location.href = "dashboard.html";
@@ -126,10 +129,14 @@ async function handleAdminLogin(event) {
 
     } catch (err) {
         console.error("Login error:", err);
-
         mostrarAlerta("Error al iniciar sesión: " + err.message, "danger");
+
+        // Rehabilitar botón si hay error
+        boton.disabled = false;
+        boton.innerHTML = textoOriginal;
     }
 }
+
 
 //FUNCION PARA CREAR PRODUCTO
 async function crearProducto(nuevoProducto) {
@@ -283,8 +290,16 @@ function vaciarCarritoConfirmado() {
 }
 
 async function procederCompra() {
+    const boton = document.getElementById('btn-proceder-compra');
+    const textoOriginal = boton.innerHTML;
+
+    boton.disabled = true;
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+
     if (carrito.length === 0) {
         mostrarAlerta('Tu carrito está vacío', 'warning');
+        boton.disabled = false;
+        boton.innerHTML = textoOriginal;
         return;
     }
 
@@ -292,15 +307,13 @@ async function procederCompra() {
     const medioPago = document.getElementById('medio-pago').value;
     const totalCompra = calcularTotalCarrito();
 
-    // 1) Construir el array de productos con los campos correctos
     const productosPayload = carrito.map(item => ({
-        id_product: item.id_product,                              // la clave real de tu objeto
-        cantidad: item.cantidad,                                // la clave real
-        subtotal: parseFloat(item.price) * item.cantidad        // convierte price (string) a número
+        id_product: item.id_product,
+        cantidad: item.cantidad,
+        subtotal: parseFloat(item.price) * item.cantidad
     }));
 
     try {
-        // 2) Enviar la venta al backend
         const res = await fetch('http://localhost:3000/api/ventas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -316,12 +329,14 @@ async function procederCompra() {
             const error = await res.json();
             console.error('Error al registrar venta:', error);
             mostrarAlerta('Error al registrar la venta', 'danger');
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
             return;
         }
 
         const venta = await res.json();
         console.log('Venta registrada:', venta);
-        // 3) Guardar info para el ticket y limpiar carrito
+
         const compra = {
             productos: [...carrito],
             total: totalCompra,
@@ -343,10 +358,10 @@ async function procederCompra() {
     } catch (err) {
         console.error('Error al procesar la compra:', err);
         mostrarAlerta('Ocurrió un error inesperado', 'danger');
+        boton.disabled = false;
+        boton.innerHTML = textoOriginal;
     }
 }
-
-
 
 function actualizarContadorCarrito() {// Actualizar contador en navbar si existe
     const contadorNav = document.getElementById('contador-carrito');
