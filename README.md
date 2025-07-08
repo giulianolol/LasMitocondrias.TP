@@ -15,11 +15,9 @@ SETUP: setup_backend = Ejecutar este script para instalar las dependencias.
 
     # Routes -> API: Endpoints separados por módulos juntos con su lógica.
 
-    # Services: Servicios Auxiliares (Subida de imagenes)
-
     # .env: Variables de entorno.
 
-    # Server.js: Importamos las sessiones, middelwares, conexiones y modelos, sincronizamos la base de datos y motamos las rutas. Basicamente, armamos el servidor.
+    # Server.js: Importamos las sessiones, middelwares, conexiones y modelos, sincronizamos la base de datos y motamos las rutas. Basicamente, montamos el servidor.
 
 -FRONTEND:
 
@@ -27,7 +25,7 @@ SETUP: setup_backend = Ejecutar este script para instalar las dependencias.
 
     # pages: Carpeta de documentos HTML.
 
-    # src: main.js y app.js
+    # src: main.js
 
     # styles: styles.css
     
