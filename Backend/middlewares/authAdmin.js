@@ -54,7 +54,7 @@ const tokenAdmin = async (req, res, next) => {
     try {
         const tokenSinFormatear = req.headers['authorization'];
         const decoded = jwt.verify(tokenSinFormatear.split(' ')[1], process.env.JWT_SECRET);
-        console.log(decoded);
+
         if (decoded.role === 'admin') {
             next();
         }
