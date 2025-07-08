@@ -1316,7 +1316,7 @@ async function guardarCambiosProducto(e) {
 
         // Limpiamos y redirigimos
         localStorage.removeItem('productoParaModificar');
-        // window.location.href = 'dashboard.html';
+        window.location.href = 'dashboard.html';
     } catch (err) {
         console.error('Error completo:', err);
         mostrarAlerta('Error al guardar cambios: ' + err.message, 'danger');
